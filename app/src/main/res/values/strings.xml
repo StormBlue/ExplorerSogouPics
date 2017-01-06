@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">ExplorerSouhuPics</string>
+    <string name="nav_ui">导航</string>
+    <string name="nav_data">数据</string>
+    <string name="nav_service">服务</string>
+    <string name="nav_network">网络</string>
+    <string name="nav_media">多媒体</string>
 </resources>

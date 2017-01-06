@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/bottom_nav_data"
+        android:enabled="true"
+        android:icon="@drawable/ic_desktop_mac_black_24dp"
+        android:title="@string/nav_data"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/bottom_nav_net"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_dialog_email"
+        android:title="@string/nav_network"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/bottom_nav_media"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:title="@string/nav_media"
+        app:showAsAction="ifRoom" />
+</menu>

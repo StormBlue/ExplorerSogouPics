@@ -1,20 +1,52 @@
 package com.bluestrom.gao.explorersouhupics.activity;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 
 import com.bluestrom.gao.explorersouhupics.R;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
-    private RecyclerView mPicsList;
+    private ViewPager contentView;
+
+    private BottomNavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mPicsList = (RecyclerView) findViewById(R.id.pics_list);
+        init();
     }
 
+    private void init() {
+        initView();
+    }
+
+    private void initView() {
+        navigationView = (BottomNavigationView) findViewById(R.id.bottom_nav_view);
+        navigationView.setOnNavigationItemSelectedListener(this);
+//        navigationView.setItemIconTintList((ColorStateList)getResources().getColorStateList(R.color.cardview_dark_background));
+        contentView = (ViewPager) findViewById(R.id.main_content_viewpager);
+    }
+
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.bottom_nav_data:
+                break;
+            case R.id.bottom_nav_media:
+                break;
+            case R.id.bottom_nav_net:
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
 }
