@@ -1,6 +1,5 @@
 package com.bluestrom.gao.explorersouhupics.activity;
 
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -9,10 +8,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.bluestrom.gao.explorersouhupics.R;
+import com.bluestrom.gao.explorersouhupics.adapter.MainContentViewPagerAdapter;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private ViewPager contentView;
+
+    private MainContentViewPagerAdapter viewPagerAdapter;
 
     private BottomNavigationView navigationView;
 
@@ -25,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private void init() {
         initView();
+        viewPagerAdapter = new MainContentViewPagerAdapter(getSupportFragmentManager(),);
+        contentView.setAdapter(viewPagerAdapter);
     }
 
     private void initView() {
