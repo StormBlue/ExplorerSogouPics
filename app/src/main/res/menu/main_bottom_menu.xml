@@ -3,23 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/bottom_nav_data"
+        android:id="@+id/bottom_nav_beauty"
         android:enabled="true"
         android:icon="@drawable/ic_desktop_mac_black_24dp"
-        android:title="@string/nav_data"
+        android:title="@string/nav_beauty"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/bottom_nav_net"
+        android:id="@+id/bottom_nav_funny"
         android:enabled="true"
         android:icon="@android:drawable/ic_dialog_email"
-        android:title="@string/nav_network"
+        android:title="@string/nav_funny"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/bottom_nav_media"
+        android:id="@+id/bottom_nav_art"
         android:enabled="true"
         android:icon="@android:drawable/ic_dialog_info"
-        android:title="@string/nav_media"
+        android:title="@string/nav_art"
         app:showAsAction="ifRoom" />
 </menu>
