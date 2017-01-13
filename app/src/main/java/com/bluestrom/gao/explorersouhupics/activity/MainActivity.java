@@ -40,19 +40,37 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         fragmentList.add(FunnyFragment.newInstance(1));
         initView();
         viewPagerAdapter = new MainContentViewPagerAdapter(getSupportFragmentManager(), fragmentList);
+        // 缓存两个页面
+        contentViewPager.setOffscreenPageLimit(2);
         contentViewPager.setAdapter(viewPagerAdapter);
+        contentViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                navigationView.getMenu().getItem(position).setChecked(true);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         navigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.bottom_nav_beauty:
-                        contentViewPager.setCurrentItem(0,false);
+                        contentViewPager.setCurrentItem(0, false);
                         break;
                     case R.id.bottom_nav_funny:
-                        contentViewPager.setCurrentItem(1,false);
+                        contentViewPager.setCurrentItem(1, false);
                         break;
                     case R.id.bottom_nav_art:
-                        contentViewPager.setCurrentItem(2,false);
+                        contentViewPager.setCurrentItem(2, false);
                         break;
                     default:
                         break;
