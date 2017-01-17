@@ -10,14 +10,12 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/main_content_viewpager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible" />
+        android:layout_height="match_parent" />
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/bottom_nav_view"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
         android:background="@android:color/white"
         app:elevation="16dp"
