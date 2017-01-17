@@ -3,11 +3,9 @@ package com.bluestrom.gao.explorersouhupics.activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -18,11 +16,6 @@ import com.bluestrom.gao.explorersouhupics.fragment.dummy.DummyContent;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
-import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
-import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
-import static android.support.v4.widget.ViewDragHelper.STATE_SETTLING;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, FunnyFragment.OnListFragmentInteractionListener, View.OnClickListener {
 
@@ -35,8 +28,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private BottomNavigationView navigationView;
 
     private List<Fragment> fragmentList;
-
-    private BottomSheetBehavior mBottomSheetBehavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,9 +87,17 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         navigationView = (BottomNavigationView) findViewById(R.id.bottom_nav_view);
         navigationView.setOnNavigationItemSelectedListener(this);
         contentViewPager = (ViewPager) findViewById(R.id.main_content_viewpager);
-        mBottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_nav_view));
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -123,15 +122,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.test_button:
-                Log.i(TAG, "操作开始SheetBehavior.State" + mBottomSheetBehavior.getState());
-                if (mBottomSheetBehavior.getState() == STATE_EXPANDED) {
-                    mBottomSheetBehavior.setState(STATE_COLLAPSED);
-                } else if (mBottomSheetBehavior.getState() == STATE_COLLAPSED) {
-                    mBottomSheetBehavior.setState(STATE_EXPANDED);
-                }
-                Log.i(TAG, "操作结束SheetBehavior.State" + mBottomSheetBehavior.getState());
-                break;
             default:
                 break;
         }

@@ -11,7 +11,6 @@
         android:id="@+id/main_content_viewpager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottom_nav_view"
         android:visibility="visible" />
 
     <android.support.design.widget.BottomNavigationView
@@ -24,14 +23,6 @@
         app:elevation="16dp"
         app:itemIconTint="@color/nav_item_background"
         app:itemTextColor="@color/nav_item_background"
-        app:layout_behavior="@string/bottom_sheet_behavior"
+        app:layout_anchorGravity="bottom"
         app:menu="@menu/main_bottom_menu" />
-
-    <Button
-        android:id="@+id/test_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:onClick="onClick"
-        android:text="测试" />
 </android.support.design.widget.CoordinatorLayout>
