@@ -22,4 +22,11 @@
         android:icon="@android:drawable/ic_dialog_info"
         android:title="@string/nav_art"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/bottom_nav_offline"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_dialog_alert"
+        android:title="@string/nav_offline"
+        app:showAsAction="ifRoom" />
 </menu>

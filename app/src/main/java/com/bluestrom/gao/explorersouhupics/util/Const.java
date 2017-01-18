@@ -8,4 +8,6 @@ public class Const {
     public static final String APP_NAME = "explorersouhupics";
     public static int SCREEN_WIDTH;
     public static int SCREEN_HEIGHT;
+
+    public static final String SOUHU_PIC_BASIC_URL = "http://pic.sogou.com/pics/channel/getAllRecomPicByTag.jsp";
 }

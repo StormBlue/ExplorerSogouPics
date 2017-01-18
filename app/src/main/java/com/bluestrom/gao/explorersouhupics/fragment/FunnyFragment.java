@@ -2,7 +2,6 @@ package com.bluestrom.gao.explorersouhupics.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +13,18 @@ import android.view.ViewGroup;
 import com.bluestrom.gao.explorersouhupics.R;
 import com.bluestrom.gao.explorersouhupics.fragment.dummy.DummyContent;
 import com.bluestrom.gao.explorersouhupics.fragment.dummy.DummyContent.PhotoBean;
+import com.bluestrom.gao.explorersouhupics.pojo.SouhuPicsResult;
+import com.bluestrom.gao.explorersouhupics.util.Const;
+import com.bluestrom.gao.explorersouhupics.util.NetworkCall;
+import com.bluestrom.gao.explorersouhupics.util.Pub;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 /**
  * A fragment representing a list of Items.
@@ -59,8 +70,6 @@ public class FunnyFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_funny_photo, container, false);
-
-        // Set the adapter
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
         Context context = view.getContext();
         if (mColumnCount <= 1) {
@@ -71,7 +80,6 @@ public class FunnyFragment extends Fragment {
         recyclerView.setAdapter(new PhotoBeanRecyclerViewAdapter(DummyContent.ITEMS, mListener));
         return view;
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -103,5 +111,31 @@ public class FunnyFragment extends Fragment {
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListFragmentInteraction(PhotoBean item);
+    }
+
+    private void getBeautyPics() {
+        Map<String, String> params = new HashMap<>();
+        params.put("category", "美女");
+        params.put("tag", "");
+        params.put("start", "0");
+        params.put("len", "1");
+        Callback picCallback = new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    if (!response.isSuccessful())
+                        throw new IOException("Unexpected code " + response);
+                    SouhuPicsResult result = Pub.getGsonClient().fromJson(response.body().charStream(), SouhuPicsResult.class);
+                } finally {
+                    response.close();
+                }
+            }
+        };
+        NetworkCall.asynNetworkGet(Const.SOUHU_PIC_BASIC_URL, null, params, picCallback);
     }
 }

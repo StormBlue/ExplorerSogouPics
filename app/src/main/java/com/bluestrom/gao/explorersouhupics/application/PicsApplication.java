@@ -13,9 +13,9 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 
 import java.util.Stack;
 
-public class GaoApplication extends Application {
+public class PicsApplication extends Application {
 
-    private static GaoApplication instance = null;
+    private static PicsApplication instance = null;
     private static Stack<Activity> activityStack;
 
     @Override
@@ -30,7 +30,7 @@ public class GaoApplication extends Application {
         Const.SCREEN_HEIGHT = point.y;
     }
 
-    public static GaoApplication getInstance() {
+    public static PicsApplication getInstance() {
         return instance;
     }
 

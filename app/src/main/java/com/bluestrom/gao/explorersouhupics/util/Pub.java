@@ -32,14 +32,12 @@ import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.text.format.Time;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.bluestrom.gao.explorersouhupics.application.GaoApplication;
-
-import org.json.JSONObject;
+import com.bluestrom.gao.explorersouhupics.application.PicsApplication;
+import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -70,18 +68,10 @@ public class Pub {
 
     private static final String TAG = "Pub";
 
-    public static final boolean mbIsDeBug = false;
+    private static Gson gson = new Gson();
 
-    public static void LOG(String msg) {
-        if (mbIsDeBug) {
-            Log.i("Chat Client", msg);
-        }
-    }
-
-    public static void LOG1(String msg) {
-        if (mbIsDeBug) {
-            Log.i("Chat Client", msg);
-        }
+    public static Gson getGsonClient() {
+        return gson;
     }
 
     /**
@@ -163,12 +153,6 @@ public class Pub {
         return true;
     }
 
-    public static void LOG(String tag, String msg) {
-        if (mbIsDeBug) {
-            Log.i(tag, msg);
-        }
-    }
-
     /**
      * 当前系统是否低内存
      *
@@ -176,7 +160,7 @@ public class Pub {
      */
     public static boolean getIsLowMemory() {
         try {
-            ActivityManager am = (ActivityManager) GaoApplication.getInstance().getSystemService(Context.ACTIVITY_SERVICE);
+            ActivityManager am = (ActivityManager) PicsApplication.getInstance().getSystemService(Context.ACTIVITY_SERVICE);
             MemoryInfo mi = new MemoryInfo();
             am.getMemoryInfo(mi);
             return mi.lowMemory;
@@ -193,12 +177,12 @@ public class Pub {
      * @return
      */
     public static String getAvailMemory() {// 获取android当前可用内存大小
-        ActivityManager am = (ActivityManager) GaoApplication.getInstance().getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager am = (ActivityManager) PicsApplication.getInstance().getSystemService(Context.ACTIVITY_SERVICE);
         MemoryInfo mi = new MemoryInfo();
         am.getMemoryInfo(mi);
         // mi.availMem; 当前系统的可用内存
-        String availMem = Formatter.formatFileSize(GaoApplication.getInstance().getBaseContext(), mi.availMem);// 将获取的内存大小规格化
-        String threshold = Formatter.formatFileSize(GaoApplication.getInstance().getBaseContext(), mi.threshold);// 将获取的系统内存不足的阀值，即临界值规格化
+        String availMem = Formatter.formatFileSize(PicsApplication.getInstance().getBaseContext(), mi.availMem);// 将获取的内存大小规格化
+        String threshold = Formatter.formatFileSize(PicsApplication.getInstance().getBaseContext(), mi.threshold);// 将获取的系统内存不足的阀值，即临界值规格化
         // Integer.parseInt((availMem.replace("MB", "")));
         return mi.availMem + "  " + mi.threshold + "  " + mi.lowMemory;
     }
@@ -273,9 +257,9 @@ public class Pub {
                 Method mIsLayoutSizeAtLeast = con.getClass().getMethod("isLayoutSizeAtLeast", int.class);
                 Boolean r = (Boolean) mIsLayoutSizeAtLeast.invoke(con, 0x00000004); // Configuration.SCREENLAYOUT_SIZE_XLARGE
                 if (r) {
-                    Pub.LOG("此设备是平板设备");
+                    // 平板
                 } else {
-                    Pub.LOG("此设备是手机设备");
+                    // 手机
                 }
                 return !r;
             } catch (Exception x) {
@@ -331,29 +315,6 @@ public class Pub {
 
     private static String SAVE_DATA_PATH;
 
-    /**
-     * 得到写文件的路径
-     *
-     * @return
-     */
-    public static String getSaveFilePath() {
-        if (SAVE_DATA_PATH != null) {
-            return SAVE_DATA_PATH;
-        }
-        if (!Environment.getExternalStorageDirectory().canWrite()) {
-            SAVE_DATA_PATH = GaoApplication.getInstance().getFilesDir().getAbsolutePath() + "/";
-            Pub.LOG("SAVE_USER_PATH:" + SAVE_DATA_PATH);
-            return SAVE_DATA_PATH;
-        }
-        SAVE_DATA_PATH = Environment.getExternalStorageDirectory() + "/Point/VideoChat/";
-        Pub.LOG("SAVE_USER_PATH:" + SAVE_DATA_PATH);
-        File filedir = new File(SAVE_DATA_PATH);
-        if (!filedir.exists()) {
-            filedir.mkdirs();
-        }
-        return SAVE_DATA_PATH;
-    }
-
     public static void getSuitableCameraSize() {
         Camera camera = null;
         for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
@@ -367,9 +328,7 @@ public class Pub {
             camera = Camera.open(i);
             Camera.Parameters parameters = camera.getParameters();
             List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
-            Pub.LOG("CameraPreviewSize", info.facing + "");
             for (Camera.Size previewSize : supportedPreviewSizes) {
-                Pub.LOG("CameraPreviewSize", "width:" + previewSize.width + "height:" + previewSize.height);
             }
         }
         if (null != camera) {
@@ -387,7 +346,7 @@ public class Pub {
 
     public static boolean isCanUseSim() {
         try {
-            TelephonyManager mgr = (TelephonyManager) GaoApplication.getInstance().getSystemService(Context.TELEPHONY_SERVICE);
+            TelephonyManager mgr = (TelephonyManager) PicsApplication.getInstance().getSystemService(Context.TELEPHONY_SERVICE);
             return TelephonyManager.SIM_STATE_READY == mgr.getSimState();
         } catch (Exception e) {
             e.printStackTrace();
@@ -401,7 +360,7 @@ public class Pub {
      * @return
      */
     public static String getImsi() {
-        TelephonyManager tm = (TelephonyManager) GaoApplication.getInstance().getSystemService(Context.TELEPHONY_SERVICE);
+        TelephonyManager tm = (TelephonyManager) PicsApplication.getInstance().getSystemService(Context.TELEPHONY_SERVICE);
         String IMSI = tm.getSubscriberId();
         if (IMSI == null) {
             return "";
@@ -425,7 +384,7 @@ public class Pub {
             return selfOperater;
         }
         int type = 0;// 0未知1移动2联通3电信
-        TelephonyManager tm = (TelephonyManager) GaoApplication.getInstance().getSystemService(Context.TELEPHONY_SERVICE);
+        TelephonyManager tm = (TelephonyManager) PicsApplication.getInstance().getSystemService(Context.TELEPHONY_SERVICE);
         String IMSI = tm.getSubscriberId();
         if (IMSI == null) {
             return type;
@@ -1281,7 +1240,7 @@ public class Pub {
         if (mnNetType > 0) {
             return mnNetType;
         }
-        ConnectivityManager manager = (ConnectivityManager) GaoApplication.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager manager = (ConnectivityManager) PicsApplication.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = manager.getActiveNetworkInfo();
         if (info == null) {
             mnNetType = 0;
@@ -1305,7 +1264,7 @@ public class Pub {
      */
     public static String getNetType() {
         try {
-            ConnectivityManager cm = (ConnectivityManager) GaoApplication.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager cm = (ConnectivityManager) PicsApplication.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo info = cm.getActiveNetworkInfo();
             if (info == null) {
                 return "";
@@ -1331,7 +1290,7 @@ public class Pub {
      */
     public static String getNetName() {
         try {
-            ConnectivityManager cm = (ConnectivityManager) GaoApplication.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager cm = (ConnectivityManager) PicsApplication.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo info = cm.getActiveNetworkInfo();
             String netName = null;
             int type = info.getType();
@@ -1339,7 +1298,7 @@ public class Pub {
 
                 netName = info.getTypeName(); // WIFI/MOBILE
             } else {
-                TelephonyManager tm = (TelephonyManager) GaoApplication.getInstance().getSystemService(Context.TELEPHONY_SERVICE);
+                TelephonyManager tm = (TelephonyManager) PicsApplication.getInstance().getSystemService(Context.TELEPHONY_SERVICE);
                 netName = tm.getNetworkOperatorName();
             }
             if (netName == null) {
@@ -1357,7 +1316,7 @@ public class Pub {
     public static String getNumber() {
         try {
             String number = null;
-            TelephonyManager tm = (TelephonyManager) GaoApplication.getInstance().getSystemService(Context.TELEPHONY_SERVICE);
+            TelephonyManager tm = (TelephonyManager) PicsApplication.getInstance().getSystemService(Context.TELEPHONY_SERVICE);
             number = tm.getLine1Number();
             if (number == null) {
                 return "";
@@ -1383,7 +1342,7 @@ public class Pub {
     }
 
     public static PackageInfo getPkgInfoByName(String name) {
-        Context context = GaoApplication.getInstance();
+        Context context = PicsApplication.getInstance();
         PackageInfo packageInfo = null;
         try {
             packageInfo = context.getPackageManager().getPackageInfo(name, PackageManager.GET_ACTIVITIES);
@@ -1400,8 +1359,8 @@ public class Pub {
      */
     public static String getVersionName() {
         try {
-            String packageName = GaoApplication.getInstance().getPackageName();
-            return GaoApplication.getInstance().getPackageManager().getPackageInfo(packageName, PackageManager.GET_CONFIGURATIONS).versionName;
+            String packageName = PicsApplication.getInstance().getPackageName();
+            return PicsApplication.getInstance().getPackageManager().getPackageInfo(packageName, PackageManager.GET_CONFIGURATIONS).versionName;
         } catch (Exception e) {
             return "";
         }
@@ -1414,10 +1373,9 @@ public class Pub {
      */
     public static int getVersionCodeNoChannel() {
         try {
-            String packageName = GaoApplication.getInstance().getPackageName();
-            return GaoApplication.getInstance().getPackageManager().getPackageInfo(packageName, PackageManager.GET_CONFIGURATIONS).versionCode;
+            String packageName = PicsApplication.getInstance().getPackageName();
+            return PicsApplication.getInstance().getPackageManager().getPackageInfo(packageName, PackageManager.GET_CONFIGURATIONS).versionCode;
         } catch (Exception e) {
-            Pub.LOG("getVersionName " + e.getMessage());
             return 0;
         }
     }
@@ -1430,7 +1388,7 @@ public class Pub {
     public static String getIMEI() {
         String mImei = "NULL";
         try {
-            mImei = ((TelephonyManager) GaoApplication.getInstance()
+            mImei = ((TelephonyManager) PicsApplication.getInstance()
                     .getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
         } catch (Exception e) {
             System.out.println("获取IMEI码失败");
@@ -1454,13 +1412,12 @@ public class Pub {
             } else {
                 try {
                     WifiManager wifi;
-                    wifi = (WifiManager) GaoApplication.getInstance().getSystemService(Context.WIFI_SERVICE);
+                    wifi = (WifiManager) PicsApplication.getInstance().getSystemService(Context.WIFI_SERVICE);
                     WifiInfo info = wifi.getConnectionInfo();
                     macAddr = info.getMacAddress();
                 } catch (Exception e) {
                 }
             }
-            Pub.LOG(TAG, "getMacAddr------" + macAddr);
         }
         return macAddr;
     }
@@ -1507,11 +1464,11 @@ public class Pub {
             return SAVE_PATH;
         }
         if (!Environment.getExternalStorageDirectory().canWrite()) {
-            SAVE_PATH = GaoApplication.getInstance().getFilesDir().getAbsolutePath() + "/";
+            SAVE_PATH = PicsApplication.getInstance().getFilesDir().getAbsolutePath() + "/";
             // SAVE_PATH = "";
             return SAVE_PATH;
         }
-        String sSavePath = Environment.getExternalStorageDirectory() + "/download/";
+        String sSavePath = Environment.getExternalStorageDirectory() + File.separator + Const.APP_NAME;
         File dir = new File(sSavePath);
         if (dir.exists()) {
             SAVE_PATH = sSavePath;
@@ -1523,8 +1480,7 @@ public class Pub {
             SAVE_PATH = sSavePath;
             return SAVE_PATH;
         }
-        SAVE_PATH = GaoApplication.getInstance().getFilesDir().getAbsolutePath() + "/";
-        // SAVE_PATH = "";
+        SAVE_PATH = PicsApplication.getInstance().getFilesDir().getAbsolutePath() + "/";
         return SAVE_PATH;
     }
 
@@ -1534,7 +1490,6 @@ public class Pub {
      * @return
      */
     public static boolean isSelfAppRunning(Context context) {
-        Pub.LOG("isSelfAppRunning");
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         // 获取正在运行的应用
         List<RunningAppProcessInfo> run = am.getRunningAppProcesses();
@@ -1547,7 +1502,6 @@ public class Pub {
                 continue;
             }
             if (ra.processName.equals("cn.bluestrom.client." + Const.APP_NAME)) {
-                Pub.LOG("ra.processName = " + ra.processName);
                 return true;
             }
         }
@@ -1567,7 +1521,7 @@ public class Pub {
             if (mProgressDialog != null && mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
             }
-            mProgressDialog = new ProgressDialog(GaoApplication.getInstance());
+            mProgressDialog = new ProgressDialog(PicsApplication.getInstance());
             mProgressDialog.setMessage(sMsg);
             mProgressDialog.show();
         } catch (Exception e) {

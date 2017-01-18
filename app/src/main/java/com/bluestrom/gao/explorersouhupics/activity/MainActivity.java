@@ -41,10 +41,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         fragmentList.add(FunnyFragment.newInstance(1));
         fragmentList.add(FunnyFragment.newInstance(1));
         fragmentList.add(FunnyFragment.newInstance(1));
+        fragmentList.add(FunnyFragment.newInstance(1));
         initView();
         viewPagerAdapter = new MainContentViewPagerAdapter(getSupportFragmentManager(), fragmentList);
         // 缓存两个页面
-        contentViewPager.setOffscreenPageLimit(2);
+        contentViewPager.setOffscreenPageLimit(3);
         contentViewPager.setAdapter(viewPagerAdapter);
         contentViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -62,25 +63,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
             }
         });
-        navigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.bottom_nav_beauty:
-                        contentViewPager.setCurrentItem(0, false);
-                        break;
-                    case R.id.bottom_nav_funny:
-                        contentViewPager.setCurrentItem(1, false);
-                        break;
-                    case R.id.bottom_nav_art:
-                        contentViewPager.setCurrentItem(2, false);
-                        break;
-                    default:
-                        break;
-                }
-                return true;
-            }
-        });
+        navigationView.setOnNavigationItemSelectedListener(this);
     }
 
     private void initView() {
@@ -103,11 +86,16 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.bottom_nav_beauty:
-                break;
-            case R.id.bottom_nav_art:
+                contentViewPager.setCurrentItem(0, false);
                 break;
             case R.id.bottom_nav_funny:
+                contentViewPager.setCurrentItem(1, false);
                 break;
+            case R.id.bottom_nav_art:
+                contentViewPager.setCurrentItem(2, false);
+                break;
+            case R.id.bottom_nav_offline:
+                contentViewPager.setCurrentItem(3, false);
             default:
                 break;
         }
