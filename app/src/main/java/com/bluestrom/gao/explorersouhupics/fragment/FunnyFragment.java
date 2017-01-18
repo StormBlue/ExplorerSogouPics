@@ -3,9 +3,8 @@ package com.bluestrom.gao.explorersouhupics.fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,9 +33,7 @@ import okhttp3.Response;
  */
 public class FunnyFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
@@ -72,11 +69,7 @@ public class FunnyFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_funny_photo, container, false);
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
         Context context = view.getContext();
-        if (mColumnCount <= 1) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        } else {
-            recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-        }
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setAdapter(new PhotoBeanRecyclerViewAdapter(DummyContent.ITEMS, mListener));
         return view;
     }
