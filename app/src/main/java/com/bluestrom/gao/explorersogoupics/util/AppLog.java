@@ -1,4 +1,4 @@
-package com.bluestrom.gao.explorersouhupics.util;
+package com.bluestrom.gao.explorersogoupics.util;
 
 import org.apache.log4j.Logger;
 

@@ -1,13 +1,17 @@
-package com.bluestrom.gao.explorersouhupics.fragment;
+package com.bluestrom.gao.explorersogoupics.fragment;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bluestrom.gao.explorersouhupics.R;
-import com.bluestrom.gao.explorersouhupics.fragment.dummy.DummyContent.PhotoBean;
+import com.bluestrom.gao.explorersogoupics.R;
+import com.bluestrom.gao.explorersogoupics.application.PicsApplication;
+import com.bluestrom.gao.explorersogoupics.fragment.dummy.DummyContent.PhotoBean;
+import com.bluestrom.gao.explorersogoupics.pojo.SogouPicPojo;
+import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.List;
 
@@ -18,10 +22,10 @@ import java.util.List;
  */
 public class PhotoBeanRecyclerViewAdapter extends RecyclerView.Adapter<PhotoBeanRecyclerViewAdapter.ViewHolder> {
 
-    private final List<PhotoBean> mValues;
+    private final List<SogouPicPojo> mValues;
     private final FunnyFragment.OnListFragmentInteractionListener mListener;
 
-    public PhotoBeanRecyclerViewAdapter(List<PhotoBean> items, FunnyFragment.OnListFragmentInteractionListener listener) {
+    public PhotoBeanRecyclerViewAdapter(List<SogouPicPojo> items, FunnyFragment.OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -36,9 +40,16 @@ public class PhotoBeanRecyclerViewAdapter extends RecyclerView.Adapter<PhotoBean
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
-
+        holder.picThumb.setAspectRatio(holder.mItem.getThumb_width() / holder.mItem.getThumb_height());
+        holder.picThumb.setImageURI(holder.mItem.getThumbUrl());
+        List<String> tags = holder.mItem.getTags();
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(16, 0, 0, 0);
+        for (String tag : tags) {
+            TextView tv = new TextView(PicsApplication.getInstance());
+            tv.setText(tag);
+            holder.tagsLayout.addView(tv, layoutParams);
+        }
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,20 +69,15 @@ public class PhotoBeanRecyclerViewAdapter extends RecyclerView.Adapter<PhotoBean
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public PhotoBean mItem;
+        public final SimpleDraweeView picThumb;
+        public final LinearLayout tagsLayout;
+        public SogouPicPojo mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.id);
-            mContentView = (TextView) view.findViewById(R.id.content);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            picThumb = (SimpleDraweeView) view.findViewById(R.id.pic_thumb);
+            tagsLayout = (LinearLayout) view.findViewById(R.id.tags_layout);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.bluestrom.gao.explorersouhupics.activity;
+package com.bluestrom.gao.explorersogoupics.activity;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,10 +9,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.bluestrom.gao.explorersouhupics.R;
-import com.bluestrom.gao.explorersouhupics.adapter.MainContentViewPagerAdapter;
-import com.bluestrom.gao.explorersouhupics.fragment.FunnyFragment;
-import com.bluestrom.gao.explorersouhupics.fragment.dummy.DummyContent;
+import com.bluestrom.gao.explorersogoupics.R;
+import com.bluestrom.gao.explorersogoupics.adapter.MainContentViewPagerAdapter;
+import com.bluestrom.gao.explorersogoupics.fragment.FunnyFragment;
+import com.bluestrom.gao.explorersogoupics.pojo.SogouPicPojo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,10 +38,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private void init() {
         fragmentList = new ArrayList<>();
-        fragmentList.add(FunnyFragment.newInstance(1));
-        fragmentList.add(FunnyFragment.newInstance(1));
-        fragmentList.add(FunnyFragment.newInstance(1));
-        fragmentList.add(FunnyFragment.newInstance(1));
+        fragmentList.add(new FunnyFragment());
+        fragmentList.add(new FunnyFragment());
+        fragmentList.add(new FunnyFragment());
+        fragmentList.add(new FunnyFragment());
         initView();
         viewPagerAdapter = new MainContentViewPagerAdapter(getSupportFragmentManager(), fragmentList);
         // 缓存两个页面
@@ -103,15 +103,15 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.PhotoBean item) {
-
-    }
-
-    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onListFragmentInteraction(SogouPicPojo item) {
+
     }
 }

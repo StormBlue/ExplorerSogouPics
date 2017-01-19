@@ -1,4 +1,4 @@
-package com.bluestrom.gao.explorersouhupics.util;
+package com.bluestrom.gao.explorersogoupics.util;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
@@ -36,7 +36,7 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.bluestrom.gao.explorersouhupics.application.PicsApplication;
+import com.bluestrom.gao.explorersogoupics.application.PicsApplication;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;

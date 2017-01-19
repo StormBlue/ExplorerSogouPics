@@ -1,4 +1,4 @@
-package com.bluestrom.gao.explorersouhupics.pojo;
+package com.bluestrom.gao.explorersogoupics.pojo;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import java.util.List;
  * Created by Gao-Krund on 2017/1/18.
  */
 
-public class SouhuPicsResult {
+public class SogouPicsResult {
     private String category;
 
     private String tag;
@@ -17,7 +17,7 @@ public class SouhuPicsResult {
 
     private String items;
 
-    private List<SouhuPicsResult> all_items;
+    private List<SogouPicPojo> all_items;
 
     private String newsResult;
 
@@ -69,11 +69,11 @@ public class SouhuPicsResult {
         return this.items;
     }
 
-    public void setAll_items(List<SouhuPicsResult> all_items) {
+    public void setAll_items(List<SogouPicPojo> all_items) {
         this.all_items = all_items;
     }
 
-    public List<SouhuPicsResult> getAll_items() {
+    public List<SogouPicPojo> getAll_items() {
         return this.all_items;
     }
 

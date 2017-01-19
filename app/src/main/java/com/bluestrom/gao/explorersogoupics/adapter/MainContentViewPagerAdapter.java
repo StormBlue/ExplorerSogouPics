@@ -1,4 +1,4 @@
-package com.bluestrom.gao.explorersouhupics.adapter;
+package com.bluestrom.gao.explorersogoupics.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

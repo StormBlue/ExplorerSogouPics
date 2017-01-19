@@ -1,4 +1,4 @@
-package com.bluestrom.gao.explorersouhupics;
+package com.bluestrom.gao.explorersogoupics;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

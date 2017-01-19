@@ -1,10 +1,9 @@
-package com.bluestrom.gao.explorersouhupics.util;
+package com.bluestrom.gao.explorersogoupics.util;
 
 import android.support.annotation.Nullable;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.Map;
 
 import okhttp3.Callback;

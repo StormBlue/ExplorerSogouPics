@@ -1,4 +1,4 @@
-package com.bluestrom.gao.explorersouhupics.fragment.dummy;
+package com.bluestrom.gao.explorersogoupics.fragment.dummy;
 
 import java.util.ArrayList;
 import java.util.HashMap;

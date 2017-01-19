@@ -5,7 +5,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.bluestrom.gao.explorersouhupics.activity.MainActivity">
+    tools:context="com.bluestrom.gao.explorersogoupics.activity.MainActivity">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/main_content_viewpager"

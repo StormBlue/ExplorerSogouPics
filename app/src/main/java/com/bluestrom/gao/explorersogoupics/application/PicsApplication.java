@@ -1,4 +1,4 @@
-package com.bluestrom.gao.explorersouhupics.application;
+package com.bluestrom.gao.explorersogoupics.application;
 
 import android.app.Activity;
 import android.app.Application;
@@ -7,8 +7,8 @@ import android.graphics.Point;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.bluestrom.gao.explorersouhupics.util.Const;
-import com.bluestrom.gao.explorersouhupics.util.Pub;
+import com.bluestrom.gao.explorersogoupics.util.Const;
+import com.bluestrom.gao.explorersogoupics.util.Pub;
 import com.facebook.drawee.backends.pipeline.Fresco;
 
 import java.util.Stack;

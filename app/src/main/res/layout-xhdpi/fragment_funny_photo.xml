@@ -5,7 +5,7 @@
     android:name="com.bluestrom.gao.explorersouhupics.fragment.FunnyFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.bluestrom.gao.explorersouhupics.fragment.FunnyFragment">
+    tools:context="com.bluestrom.gao.explorersogoupics.fragment.FunnyFragment">
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
