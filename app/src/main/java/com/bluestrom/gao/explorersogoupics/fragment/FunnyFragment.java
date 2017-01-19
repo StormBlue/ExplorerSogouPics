@@ -5,15 +5,20 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.bluestrom.gao.explorersogoupics.R;
+import com.bluestrom.gao.explorersogoupics.adapter.PhotoBeanRecyclerViewAdapter;
 import com.bluestrom.gao.explorersogoupics.pojo.SogouPicPojo;
 import com.bluestrom.gao.explorersogoupics.pojo.SogouPicsResult;
+import com.bluestrom.gao.explorersogoupics.uiutil.PicsRecyclerDecoration;
 import com.bluestrom.gao.explorersogoupics.util.Const;
 import com.bluestrom.gao.explorersogoupics.util.NetworkCall;
 import com.bluestrom.gao.explorersogoupics.util.Pub;
@@ -36,6 +41,8 @@ import okhttp3.Response;
  */
 public class FunnyFragment extends Fragment {
 
+    private static final String TAG = "FunnyFragment";
+
     private List<SogouPicPojo> picsList;
 
     private OnListFragmentInteractionListener mListener;
@@ -44,7 +51,9 @@ public class FunnyFragment extends Fragment {
 
     private PhotoBeanRecyclerViewAdapter recyclerViewAdapter;
 
-    private static final int REFRESH_PICS = 0;
+    private SwipeRefreshLayout swipeRefreshLayout;
+
+    private static final int REFRESH_PICS_SUCCESS = 0, REFRESH_PICS_FAILURE = 1;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -74,30 +83,62 @@ public class FunnyFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         picsList = new ArrayList<>();
+        recyclerViewAdapter = new PhotoBeanRecyclerViewAdapter(picsList, mListener);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_funny_photo, container, false);
-        recyclerView = (RecyclerView) view.findViewById(R.id.list);
-        Context context = view.getContext();
-//        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        getBeautyPics();
+        init(view);
         return view;
+    }
+
+    private void init(View view) {
+        initView(view);
+        getFunnyPics();
+    }
+
+    private void initView(View view) {
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeLayout);
+        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getFunnyPics();
+            }
+        });
+        recyclerView = (RecyclerView) view.findViewById(R.id.funnyBeautyList);
+        Context context = view.getContext();
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+//        recyclerView.addItemDecoration(new PicsRecyclerDecoration(context));
+//        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        recyclerView.setAdapter(recyclerViewAdapter);
     }
 
     private Handler mUIHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case REFRESH_PICS:
+                case REFRESH_PICS_SUCCESS:
+                    if (swipeRefreshLayout.isRefreshing()) {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
                     SogouPicsResult picsResult = (SogouPicsResult) msg.obj;
-                    picsList = picsResult.getAll_items();
-                    recyclerViewAdapter = new PhotoBeanRecyclerViewAdapter(picsList, mListener);
-                    recyclerViewAdapter.notifyDataSetChanged();
-                    recyclerView.setAdapter(recyclerViewAdapter);
+                    for (SogouPicPojo picPojo : picsResult.getAll_items()) {
+                        picsList.add(picPojo);
+                        recyclerViewAdapter.notifyItemInserted(0);
+                    }
+                    recyclerView.scrollToPosition(0);
+                    break;
+                case REFRESH_PICS_FAILURE:
+                    if (swipeRefreshLayout.isRefreshing()) {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
                     break;
                 default:
                     break;
@@ -115,16 +156,17 @@ public class FunnyFragment extends Fragment {
         void onListFragmentInteraction(SogouPicPojo item);
     }
 
-    private void getBeautyPics() {
+    private void getFunnyPics() {
         Map<String, String> params = new HashMap<>();
-        params.put("category", "美女");
-        params.put("tag", "青春");
+        params.put("category", "搞笑");
+        params.put("tag", "");
         params.put("start", "0");
-        params.put("len", "10");
+        params.put("len", "15");
         Callback picCallback = new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-
+                Message msg = mUIHandler.obtainMessage(REFRESH_PICS_FAILURE);
+                msg.sendToTarget();
             }
 
             @Override
@@ -133,7 +175,7 @@ public class FunnyFragment extends Fragment {
                     if (!response.isSuccessful())
                         throw new IOException("Unexpected code " + response);
                     SogouPicsResult result = Pub.getGsonClient().fromJson(response.body().charStream(), SogouPicsResult.class);
-                    Message msg = mUIHandler.obtainMessage(REFRESH_PICS);
+                    Message msg = mUIHandler.obtainMessage(REFRESH_PICS_SUCCESS);
                     msg.obj = result;
                     msg.sendToTarget();
                 } finally {
@@ -141,6 +183,6 @@ public class FunnyFragment extends Fragment {
                 }
             }
         };
-        NetworkCall.asynNetworkGet(Const.SOUGOU_PIC_BASIC_URL, null, params, picCallback);
+        NetworkCall.asynNetworkGet(Const.SOGOU_PIC_BASIC_URL, null, params, picCallback);
     }
 }

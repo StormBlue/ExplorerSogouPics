@@ -9,5 +9,5 @@ public class Const {
     public static int SCREEN_WIDTH;
     public static int SCREEN_HEIGHT;
 
-    public static final String SOUGOU_PIC_BASIC_URL = "http://pic.sogou.com/pics/channel/getAllRecomPicByTag.jsp";
+    public static final String SOGOU_PIC_BASIC_URL = "http://pic.sogou.com/pics/channel/getAllRecomPicByTag.jsp";
 }

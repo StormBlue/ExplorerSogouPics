@@ -1,4 +1,4 @@
-package com.bluestrom.gao.explorersogoupics.fragment;
+package com.bluestrom.gao.explorersogoupics.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,11 +9,15 @@ import android.widget.TextView;
 
 import com.bluestrom.gao.explorersogoupics.R;
 import com.bluestrom.gao.explorersogoupics.application.PicsApplication;
+import com.bluestrom.gao.explorersogoupics.fragment.FunnyFragment;
 import com.bluestrom.gao.explorersogoupics.fragment.dummy.DummyContent.PhotoBean;
 import com.bluestrom.gao.explorersogoupics.pojo.SogouPicPojo;
+import com.bluestrom.gao.explorersogoupics.util.Pub;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.util.List;
+
+import javax.crypto.interfaces.PBEKey;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link PhotoBean} and makes a call to the
@@ -21,6 +25,8 @@ import java.util.List;
  * TODO: Replace the implementation with code for your data type.
  */
 public class PhotoBeanRecyclerViewAdapter extends RecyclerView.Adapter<PhotoBeanRecyclerViewAdapter.ViewHolder> {
+
+    private static final String TAG = "PhotoBeanRecyclerViewAdapter";
 
     private final List<SogouPicPojo> mValues;
     private final FunnyFragment.OnListFragmentInteractionListener mListener;
@@ -40,16 +46,8 @@ public class PhotoBeanRecyclerViewAdapter extends RecyclerView.Adapter<PhotoBean
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.picThumb.setAspectRatio(holder.mItem.getThumb_width() / holder.mItem.getThumb_height());
-        holder.picThumb.setImageURI(holder.mItem.getThumbUrl());
-        List<String> tags = holder.mItem.getTags();
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(16, 0, 0, 0);
-        for (String tag : tags) {
-            TextView tv = new TextView(PicsApplication.getInstance());
-            tv.setText(tag);
-            holder.tagsLayout.addView(tv, layoutParams);
-        }
+        holder.picThumb.setAspectRatio((float) holder.mItem.getSthumb_width() / holder.mItem.getSthumb_height());
+        holder.picThumb.setImageURI(holder.mItem.getSthumbUrl());
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

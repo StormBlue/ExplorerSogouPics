@@ -2,22 +2,24 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:name="com.bluestrom.gao.explorersouhupics.fragment.FunnyFragment"
+    android:name="com.bluestrom.gao.explorersogoupics.fragment.FunnyFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.bluestrom.gao.explorersogoupics.fragment.FunnyFragment">
 
     <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:behavior_overlapTop="?attr/actionBarSize"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/list"
-            android:name="com.bluestrom.gao.explorersouhupics.fragment.FunnyFragment"
+            android:id="@+id/funnyBeautyList"
+            android:name="com.bluestrom.gao.explorersogoupics.fragment.FunnyFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingRight="@dimen/activity_horizontal_small_margin"
             app:layoutManager="LinearLayoutManager"
             tools:listitem="@layout/fragment_photobean" />
     </android.support.v4.widget.SwipeRefreshLayout>

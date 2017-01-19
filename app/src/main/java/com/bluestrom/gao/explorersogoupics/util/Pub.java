@@ -32,6 +32,7 @@ import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.text.format.Time;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.WindowManager;
@@ -69,6 +70,14 @@ public class Pub {
     private static final String TAG = "Pub";
 
     private static Gson gson = new Gson();
+
+    public static final boolean mbIsDeBug = true;
+
+    public static void LOG(String tag, String msg) {
+        if (mbIsDeBug) {
+            Log.i(tag, msg);
+        }
+    }
 
     public static Gson getGsonClient() {
         return gson;

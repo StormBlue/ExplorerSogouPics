@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.bluestrom.gao.explorersouhupics", appContext.getPackageName());
+        assertEquals("com.bluestrom.gao.explorersogoupics", appContext.getPackageName());
     }
 }
