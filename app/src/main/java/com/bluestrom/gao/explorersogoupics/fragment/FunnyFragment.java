@@ -7,7 +7,6 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
@@ -18,7 +17,6 @@ import com.bluestrom.gao.explorersogoupics.R;
 import com.bluestrom.gao.explorersogoupics.adapter.PhotoBeanRecyclerViewAdapter;
 import com.bluestrom.gao.explorersogoupics.pojo.SogouPicPojo;
 import com.bluestrom.gao.explorersogoupics.pojo.SogouPicsResult;
-import com.bluestrom.gao.explorersogoupics.uiutil.PicsRecyclerDecoration;
 import com.bluestrom.gao.explorersogoupics.util.Const;
 import com.bluestrom.gao.explorersogoupics.util.NetworkCall;
 import com.bluestrom.gao.explorersogoupics.util.Pub;
@@ -54,6 +52,12 @@ public class FunnyFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private static final int REFRESH_PICS_SUCCESS = 0, REFRESH_PICS_FAILURE = 1;
+
+    private int currentStartPosition;
+
+    private final int picsRequestNum = 15;
+
+    private final int loadMoreThreshold = 3;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -95,16 +99,14 @@ public class FunnyFragment extends Fragment {
     }
 
     private void init(View view) {
+        currentStartPosition = 0;
         initView(view);
         getFunnyPics();
     }
 
     private void initView(View view) {
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeLayout);
-        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -114,6 +116,16 @@ public class FunnyFragment extends Fragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.funnyBeautyList);
         Context context = view.getContext();
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager) recyclerView.getLayoutManager();
+                if (layoutManager.getItemCount() - layoutManager.findLastVisibleItemPositions(null)[0] < loadMoreThreshold) {
+                    getFunnyPics();
+                }
+            }
+        });
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 //        recyclerView.addItemDecoration(new PicsRecyclerDecoration(context));
 //        recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -129,11 +141,12 @@ public class FunnyFragment extends Fragment {
                         swipeRefreshLayout.setRefreshing(false);
                     }
                     SogouPicsResult picsResult = (SogouPicsResult) msg.obj;
+                    currentStartPosition += picsResult.getAll_items().size();
                     for (SogouPicPojo picPojo : picsResult.getAll_items()) {
                         picsList.add(picPojo);
                         recyclerViewAdapter.notifyItemInserted(0);
                     }
-                    recyclerView.scrollToPosition(0);
+//                    recyclerView.scrollToPosition(0);
                     break;
                 case REFRESH_PICS_FAILURE:
                     if (swipeRefreshLayout.isRefreshing()) {
@@ -160,8 +173,8 @@ public class FunnyFragment extends Fragment {
         Map<String, String> params = new HashMap<>();
         params.put("category", "美女");
         params.put("tag", "");
-        params.put("start", "0");
-        params.put("len", "100");
+        params.put("start", String.valueOf(currentStartPosition));
+        params.put("len", String.valueOf(picsRequestNum));
         Callback picCallback = new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
