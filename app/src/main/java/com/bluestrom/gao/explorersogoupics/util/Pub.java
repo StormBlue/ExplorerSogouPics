@@ -1473,11 +1473,11 @@ public class Pub {
             return SAVE_PATH;
         }
         if (!Environment.getExternalStorageDirectory().canWrite()) {
-            SAVE_PATH = PicsApplication.getInstance().getFilesDir().getAbsolutePath() + "/";
+            SAVE_PATH = PicsApplication.getInstance().getFilesDir().getAbsolutePath() + File.separator;
             // SAVE_PATH = "";
             return SAVE_PATH;
         }
-        String sSavePath = Environment.getExternalStorageDirectory() + File.separator + Const.APP_NAME;
+        String sSavePath = Environment.getExternalStorageDirectory() + File.separator + Const.APP_NAME + File.separator;
         File dir = new File(sSavePath);
         if (dir.exists()) {
             SAVE_PATH = sSavePath;

@@ -158,10 +158,10 @@ public class FunnyFragment extends Fragment {
 
     private void getFunnyPics() {
         Map<String, String> params = new HashMap<>();
-        params.put("category", "搞笑");
+        params.put("category", "美女");
         params.put("tag", "");
         params.put("start", "0");
-        params.put("len", "15");
+        params.put("len", "100");
         Callback picCallback = new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {

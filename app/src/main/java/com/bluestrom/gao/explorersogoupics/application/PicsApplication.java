@@ -9,8 +9,12 @@ import android.view.WindowManager;
 
 import com.bluestrom.gao.explorersogoupics.util.Const;
 import com.bluestrom.gao.explorersogoupics.util.Pub;
+import com.facebook.cache.disk.DiskCacheConfig;
+import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
 
+import java.io.File;
 import java.util.Stack;
 
 public class PicsApplication extends Application {
@@ -22,16 +26,41 @@ public class PicsApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        Fresco.initialize(this);
+        init();
+    }
+
+    public static PicsApplication getInstance() {
+        return instance;
+    }
+
+    private void init() {
         WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         Point point = Pub.getDisplaySize(display);
         Const.SCREEN_WIDTH = point.x;
         Const.SCREEN_HEIGHT = point.y;
-    }
 
-    public static PicsApplication getInstance() {
-        return instance;
+        DiskCacheConfig mainDiskCacheConfig = DiskCacheConfig.newBuilder(instance)
+                .setMaxCacheSize(200 * ByteConstants.MB)
+                .setMaxCacheSizeOnLowDiskSpace(80 * ByteConstants.MB)
+                .setMaxCacheSizeOnVeryLowDiskSpace(40 * ByteConstants.MB)
+                .setBaseDirectoryName(Const.PICS_ORIGIN_CACHE_DIR)
+                .setBaseDirectoryPath(new File(Pub.getSavePath()))
+                .build();
+
+        DiskCacheConfig smallImageDiskCacheConfig = DiskCacheConfig.newBuilder(instance)
+                .setMaxCacheSize(80 * ByteConstants.MB)
+                .setMaxCacheSizeOnLowDiskSpace(40 * ByteConstants.MB)
+                .setMaxCacheSizeOnVeryLowDiskSpace(20 * ByteConstants.MB)
+                .setBaseDirectoryName(Const.PICS_STHUMB_CACHE_DIR)
+                .setBaseDirectoryPath(new File(Pub.getSavePath()))
+                .build();
+
+        ImagePipelineConfig pipelConfig = ImagePipelineConfig.newBuilder(instance)
+                .setMainDiskCacheConfig(mainDiskCacheConfig)
+                .setSmallImageDiskCacheConfig(smallImageDiskCacheConfig)
+                .build();
+        Fresco.initialize(this, pipelConfig);
     }
 
     /**

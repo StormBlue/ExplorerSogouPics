@@ -1,23 +1,23 @@
 package com.bluestrom.gao.explorersogoupics.adapter;
 
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.bluestrom.gao.explorersogoupics.R;
-import com.bluestrom.gao.explorersogoupics.application.PicsApplication;
 import com.bluestrom.gao.explorersogoupics.fragment.FunnyFragment;
 import com.bluestrom.gao.explorersogoupics.fragment.dummy.DummyContent.PhotoBean;
 import com.bluestrom.gao.explorersogoupics.pojo.SogouPicPojo;
-import com.bluestrom.gao.explorersogoupics.util.Pub;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 
 import java.util.List;
-
-import javax.crypto.interfaces.PBEKey;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link PhotoBean} and makes a call to the
@@ -47,7 +47,13 @@ public class PhotoBeanRecyclerViewAdapter extends RecyclerView.Adapter<PhotoBean
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
         holder.picThumb.setAspectRatio((float) holder.mItem.getSthumb_width() / holder.mItem.getSthumb_height());
-        holder.picThumb.setImageURI(holder.mItem.getSthumbUrl());
+        ImageRequest sthumbRequest = ImageRequestBuilder.newBuilderWithSource(Uri.parse(holder.mItem.getSthumbUrl()))
+                .setCacheChoice(ImageRequest.CacheChoice.SMALL)
+                .build();
+        DraweeController sthumbController = Fresco.newDraweeControllerBuilder()
+                .setImageRequest(sthumbRequest)
+                .build();
+        holder.picThumb.setController(sthumbController);
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
