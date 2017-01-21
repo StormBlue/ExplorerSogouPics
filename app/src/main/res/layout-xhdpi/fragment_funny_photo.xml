@@ -19,6 +19,7 @@
             android:name="com.bluestrom.gao.explorersogoupics.fragment.FunnyFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/activity_horizontal_small_margin"
             android:paddingRight="@dimen/activity_horizontal_small_margin"
             app:layoutManager="LinearLayoutManager"
             tools:listitem="@layout/fragment_photobean" />

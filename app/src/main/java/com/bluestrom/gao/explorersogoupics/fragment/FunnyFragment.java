@@ -17,6 +17,7 @@ import com.bluestrom.gao.explorersogoupics.R;
 import com.bluestrom.gao.explorersogoupics.adapter.PhotoBeanRecyclerViewAdapter;
 import com.bluestrom.gao.explorersogoupics.pojo.SogouPicPojo;
 import com.bluestrom.gao.explorersogoupics.pojo.SogouPicsResult;
+import com.bluestrom.gao.explorersogoupics.uiutil.PicsRecyclerDecoration;
 import com.bluestrom.gao.explorersogoupics.util.Const;
 import com.bluestrom.gao.explorersogoupics.util.NetworkCall;
 import com.bluestrom.gao.explorersogoupics.util.Pub;
@@ -55,9 +56,13 @@ public class FunnyFragment extends Fragment {
 
     private int currentStartPosition;
 
+    private final int picsRowNum = 2;
+
     private final int picsRequestNum = 15;
 
     private final int loadMoreThreshold = 3;
+
+    private boolean isRequestingPics = false;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -101,7 +106,7 @@ public class FunnyFragment extends Fragment {
     private void init(View view) {
         currentStartPosition = 0;
         initView(view);
-        getFunnyPics();
+        getFunnyPics(0);
     }
 
     private void initView(View view) {
@@ -110,26 +115,37 @@ public class FunnyFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getFunnyPics();
+                getFunnyPics(0);
             }
         });
         recyclerView = (RecyclerView) view.findViewById(R.id.funnyBeautyList);
         Context context = view.getContext();
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(picsRowNum, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager) recyclerView.getLayoutManager();
-                if (layoutManager.getItemCount() - layoutManager.findLastVisibleItemPositions(null)[0] < loadMoreThreshold) {
-                    getFunnyPics();
+                if (layoutManager.getItemCount() - getLastVisibleItemPositionFromLayoutManager(layoutManager) < loadMoreThreshold) {
+                    getFunnyPics(1);
                 }
             }
         });
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-//        recyclerView.addItemDecoration(new PicsRecyclerDecoration(context));
+        recyclerView.addItemDecoration(new PicsRecyclerDecoration(context));
 //        recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(recyclerViewAdapter);
+    }
+
+    private int getLastVisibleItemPositionFromLayoutManager(StaggeredGridLayoutManager layoutManager) {
+        int result = 0;
+        int[] positions = layoutManager.findLastVisibleItemPositions(null);
+        for (int i = 0; i < picsRowNum; i++) {
+            if (positions[i] > result) {
+                result = positions[i];
+            }
+        }
+        return result;
     }
 
     private Handler mUIHandler = new Handler() {
@@ -142,11 +158,16 @@ public class FunnyFragment extends Fragment {
                     }
                     SogouPicsResult picsResult = (SogouPicsResult) msg.obj;
                     currentStartPosition += picsResult.getAll_items().size();
-                    for (SogouPicPojo picPojo : picsResult.getAll_items()) {
-                        picsList.add(picPojo);
-                        recyclerViewAdapter.notifyItemInserted(0);
+                    if (0 == msg.arg1) {
+                        for (SogouPicPojo picPojo : picsResult.getAll_items()) {
+                            picsList.add(picPojo);
+                            recyclerViewAdapter.notifyItemInserted(0);
+                        }
+                        recyclerView.scrollToPosition(0);
+                    } else {
+                        picsList.addAll(picsResult.getAll_items());
+                        recyclerViewAdapter.notifyDataSetChanged();
                     }
-//                    recyclerView.scrollToPosition(0);
                     break;
                 case REFRESH_PICS_FAILURE:
                     if (swipeRefreshLayout.isRefreshing()) {
@@ -169,7 +190,13 @@ public class FunnyFragment extends Fragment {
         void onListFragmentInteraction(SogouPicPojo item);
     }
 
-    private void getFunnyPics() {
+    /**
+     * 请求搜狗图片列表
+     *
+     * @param flag 0为刷新，1为加载更多
+     */
+    private void getFunnyPics(final int flag) {
+        if (isRequestingPics) return;
         Map<String, String> params = new HashMap<>();
         params.put("category", "美女");
         params.put("tag", "");
@@ -178,18 +205,21 @@ public class FunnyFragment extends Fragment {
         Callback picCallback = new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                isRequestingPics = false;
                 Message msg = mUIHandler.obtainMessage(REFRESH_PICS_FAILURE);
                 msg.sendToTarget();
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                isRequestingPics = false;
                 try {
                     if (!response.isSuccessful())
                         throw new IOException("Unexpected code " + response);
                     SogouPicsResult result = Pub.getGsonClient().fromJson(response.body().charStream(), SogouPicsResult.class);
                     Message msg = mUIHandler.obtainMessage(REFRESH_PICS_SUCCESS);
                     msg.obj = result;
+                    msg.arg1 = flag;
                     msg.sendToTarget();
                 } finally {
                     response.close();
@@ -197,5 +227,6 @@ public class FunnyFragment extends Fragment {
             }
         };
         NetworkCall.asynNetworkGet(Const.SOGOU_PIC_BASIC_URL, null, params, picCallback);
+        isRequestingPics = true;
     }
 }

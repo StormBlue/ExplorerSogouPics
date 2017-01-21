@@ -25,7 +25,8 @@ public class PicsRecyclerDecoration extends RecyclerView.ItemDecoration {
 
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-
+        outRect.left = 8;
+        outRect.right = 8;
     }
 }
 
