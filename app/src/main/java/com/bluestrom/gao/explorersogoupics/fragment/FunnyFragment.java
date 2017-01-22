@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -65,6 +67,8 @@ public class FunnyFragment extends Fragment {
     private final int loadMoreThreshold = 3;
 
     private boolean isRequestingPics = false;
+
+    private final int PICS_REQUEST_FLAG_INIT = 0, PICS_REQUEST_FLAG_REFRESH = 1, PICS_REQUEST_FLAG_LOADMORE = 2;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -109,7 +113,7 @@ public class FunnyFragment extends Fragment {
     private void init(View view) {
         currentStartPosition = 0;
         initView(view);
-        getFunnyPics(0);
+        getFunnyPics(PICS_REQUEST_FLAG_INIT);
     }
 
     private void initView(View view) {
@@ -118,7 +122,7 @@ public class FunnyFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getFunnyPics(0);
+                getFunnyPics(PICS_REQUEST_FLAG_REFRESH);
             }
         });
         recyclerView = (RecyclerView) view.findViewById(R.id.funnyBeautyList);
@@ -130,7 +134,7 @@ public class FunnyFragment extends Fragment {
                 super.onScrollStateChanged(recyclerView, newState);
                 StaggeredGridLayoutManager layoutManager = (StaggeredGridLayoutManager) recyclerView.getLayoutManager();
                 if (layoutManager.getItemCount() - getLastVisibleItemPositionFromLayoutManager(layoutManager) < loadMoreThreshold) {
-                    getFunnyPics(1);
+                    getFunnyPics(PICS_REQUEST_FLAG_LOADMORE);
                 }
             }
         });
@@ -159,22 +163,36 @@ public class FunnyFragment extends Fragment {
                     if (swipeRefreshLayout.isRefreshing()) {
                         swipeRefreshLayout.setRefreshing(false);
                     }
+                    if (swipeRefreshLayout.isRefreshing()) {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
                     SogouPicsResult picsResult = (SogouPicsResult) msg.obj;
-                    List<SogouPicPojo> insertedPics = insertPicsToDatabase(picsResult.getAll_items());
-                    currentStartPosition += insertedPics.size();
-                    if (insertedPics == null || !(insertedPics.size() > 0)) {
-                        break;
+//                    List<SogouPicPojo> needInsertPics = needInsertPicsToList(picsResult.getAll_items(), picsList);
+                    List<SogouPicPojo> needInsertPics = picsResult.getAll_items();
+                    needInsertPics.removeAll(picsList);
+                    switch (msg.arg1) {
+                        case PICS_REQUEST_FLAG_INIT:
+                            picsList.addAll(picsResult.getAll_items());
+                            recyclerViewAdapter.notifyDataSetChanged();
+                            break;
+                        case PICS_REQUEST_FLAG_REFRESH:
+                            if (needInsertPics == null || !(needInsertPics.size() > 0)) {
+                                break;
+                            }
+                            for (SogouPicPojo picPojo : needInsertPics) {
+                                picsList.add(picPojo);
+                                recyclerViewAdapter.notifyItemInserted(0);
+                            }
+                            recyclerView.scrollToPosition(0);
+                            break;
+                        case PICS_REQUEST_FLAG_LOADMORE:
+                            picsList.addAll(needInsertPics);
+                            recyclerViewAdapter.notifyDataSetChanged();
+                            break;
+                        default:
+                            break;
                     }
-                    if (0 == msg.arg1) {
-                        for (SogouPicPojo picPojo : insertedPics) {
-                            picsList.add(picPojo);
-                            recyclerViewAdapter.notifyItemInserted(0);
-                        }
-                        recyclerView.scrollToPosition(0);
-                    } else {
-                        picsList.addAll(picsResult.getAll_items());
-                        recyclerViewAdapter.notifyDataSetChanged();
-                    }
+                    currentStartPosition = picsList.size();
                     break;
                 case REFRESH_PICS_FAILURE:
                     if (swipeRefreshLayout.isRefreshing()) {
@@ -195,6 +213,27 @@ public class FunnyFragment extends Fragment {
 
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(SogouPicPojo item);
+    }
+
+    /**
+     * 比对两个list
+     *
+     * @param shallInsertList
+     * @param originList
+     * @return
+     */
+    private List<SogouPicPojo> needInsertPicsToList(List<SogouPicPojo> shallInsertList, List<SogouPicPojo> originList) {
+        Long startTime = System.currentTimeMillis();
+        List<SogouPicPojo> result = new ArrayList<>();
+        tag: for (SogouPicPojo picPojo : shallInsertList) {
+            for (SogouPicPojo originPojo : originList) {
+                if (picPojo.getId() == originPojo.getId()) {
+                    continue tag;
+                }
+            }
+            result.add(picPojo);
+        }
+        return result;
     }
 
     /**
@@ -226,7 +265,7 @@ public class FunnyFragment extends Fragment {
         Map<String, String> params = new HashMap<>();
         params.put("category", "美女");
         params.put("tag", "");
-        params.put("start", String.valueOf(currentStartPosition));
+        params.put("start", PICS_REQUEST_FLAG_LOADMORE != flag ? String.valueOf(0) : String.valueOf(currentStartPosition));
         params.put("len", String.valueOf(picsRequestNum));
         Callback picCallback = new Callback() {
             @Override

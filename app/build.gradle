@@ -19,6 +19,15 @@ android {
     }
 }
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.greenrobot:greendao-gradle-plugin:3.2.1'
+    }
+}
+
 apply plugin: 'org.greenrobot.greendao'
 
 greendao {
@@ -27,15 +36,6 @@ greendao {
     targetGenDir 'src/main/java'//设置DaoMaster、DaoSession、Dao目录
     //targetGenDirTest：设置生成单元测试目录
     //generateTests：设置自动生成单元测试用例
-}
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'org.greenrobot:greendao-gradle-plugin:3.2.1'
-    }
 }
 
 dependencies {
@@ -48,8 +48,8 @@ dependencies {
     compile "com.android.support:recyclerview-v7:${ANDROID_SUPPORT_VERSION}"
     compile "com.android.support:design:${ANDROID_SUPPORT_VERSION}"
     compile "com.android.support:support-v4:${ANDROID_SUPPORT_VERSION}"
-    compile 'org.greenrobot:greendao:3.2.0'
     compile 'com.google.code.gson:gson:2.7'
+    compile 'org.greenrobot:greendao:3.2.0'
     compile 'com.facebook.fresco:fresco:1.0.0'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile files('libs/android-logging-log4j-1.0.3.jar')

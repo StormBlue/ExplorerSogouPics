@@ -7,6 +7,7 @@ import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 
 import java.util.List;
+
 import org.greenrobot.greendao.annotation.Generated;
 
 /**
@@ -16,8 +17,10 @@ import org.greenrobot.greendao.annotation.Generated;
 @Entity()
 public class SogouPicPojo {
 
-    @Id
-    private Long id;
+    @Id(autoincrement = true)
+    private long logId;
+
+    private long id;
 
     private int did;
 
@@ -80,15 +83,16 @@ public class SogouPicPojo {
 
     private String webLink;
 
-    @Generated(hash = 1647193743)
-    public SogouPicPojo(Long id, int did, String thumbUrl, int thumb_width,
-            int thumb_height, String sthumbUrl, int sthumb_width, int sthumb_height,
-            String bthumbUrl, int bthumb_width, int bthumb_height, String pic_url,
-            int width, int height, int size, String ori_pic_url, String ext_url,
-            String page_title, String page_url, String title, String[] tags,
-            String group_mark, int group_index, String publish_time, String surr1,
-            String surr2, String category, int weight, int deleted, String wapLink,
-            String webLink) {
+    @Generated(hash = 480009525)
+    public SogouPicPojo(long logId, long id, int did, String thumbUrl,
+                        int thumb_width, int thumb_height, String sthumbUrl, int sthumb_width,
+                        int sthumb_height, String bthumbUrl, int bthumb_width,
+                        int bthumb_height, String pic_url, int width, int height, int size,
+                        String ori_pic_url, String ext_url, String page_title, String page_url,
+                        String title, String[] tags, String group_mark, int group_index,
+                        String publish_time, String surr1, String surr2, String category,
+                        int weight, int deleted, String wapLink, String webLink) {
+        this.logId = logId;
         this.id = id;
         this.did = did;
         this.thumbUrl = thumbUrl;
@@ -126,11 +130,19 @@ public class SogouPicPojo {
     public SogouPicPojo() {
     }
 
-    public void setId(Long id) {
+    public long getLogId() {
+        return logId;
+    }
+
+    public void setLogId(long logId) {
+        this.logId = logId;
+    }
+
+    public void setId(long id) {
         this.id = id;
     }
 
-    public Long getId() {
+    public long getId() {
         return this.id;
     }
 
@@ -374,4 +386,8 @@ public class SogouPicPojo {
         return this.webLink;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return this.getId() == ((SogouPicPojo) obj).getId();
+    }
 }
