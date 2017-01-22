@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 
 import com.bluestrom.gao.explorersogoupics.R;
 import com.bluestrom.gao.explorersogoupics.adapter.PhotoBeanRecyclerViewAdapter;
+import com.bluestrom.gao.explorersogoupics.application.PicsApplication;
+import com.bluestrom.gao.explorersogoupics.greendao.SogouPicPojoDao;
 import com.bluestrom.gao.explorersogoupics.pojo.SogouPicPojo;
 import com.bluestrom.gao.explorersogoupics.pojo.SogouPicsResult;
 import com.bluestrom.gao.explorersogoupics.uiutil.PicsRecyclerDecoration;
@@ -80,6 +82,7 @@ public class FunnyFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        getActivity().getApplication();
         if (context instanceof OnListFragmentInteractionListener) {
             mListener = (OnListFragmentInteractionListener) context;
         } else {
@@ -157,9 +160,13 @@ public class FunnyFragment extends Fragment {
                         swipeRefreshLayout.setRefreshing(false);
                     }
                     SogouPicsResult picsResult = (SogouPicsResult) msg.obj;
-                    currentStartPosition += picsResult.getAll_items().size();
+                    List<SogouPicPojo> insertedPics = insertPicsToDatabase(picsResult.getAll_items());
+                    currentStartPosition += insertedPics.size();
+                    if (insertedPics == null || !(insertedPics.size() > 0)) {
+                        break;
+                    }
                     if (0 == msg.arg1) {
-                        for (SogouPicPojo picPojo : picsResult.getAll_items()) {
+                        for (SogouPicPojo picPojo : insertedPics) {
                             picsList.add(picPojo);
                             recyclerViewAdapter.notifyItemInserted(0);
                         }
@@ -188,6 +195,25 @@ public class FunnyFragment extends Fragment {
 
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(SogouPicPojo item);
+    }
+
+    /**
+     * 讲list中未加入数据库的数据加入数据库并返回
+     *
+     * @param list
+     * @return 加入到数据库中的数据
+     */
+    private List<SogouPicPojo> insertPicsToDatabase(List<SogouPicPojo> list) {
+        List<SogouPicPojo> result = new ArrayList<>();
+        SogouPicPojoDao dao = PicsApplication.getDaoSession().getSogouPicPojoDao();
+        for (int i = 0; i < list.size(); i++) {
+            SogouPicPojo picPojo = list.get(i);
+            if (!(dao.queryBuilder().where(SogouPicPojoDao.Properties.Id.eq(picPojo.getId())).list().size() > 0)) {
+                dao.insert(picPojo);
+                result.add(picPojo);
+            }
+        }
+        return result;
     }
 
     /**

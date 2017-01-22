@@ -1,5 +1,7 @@
 package com.bluestrom.gao.explorersogoupics.pojo;
 
+import org.greenrobot.greendao.annotation.Entity;
+
 import java.util.List;
 
 /**

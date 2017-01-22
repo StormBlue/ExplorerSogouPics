@@ -7,12 +7,16 @@ import android.graphics.Point;
 import android.view.Display;
 import android.view.WindowManager;
 
+import com.bluestrom.gao.explorersogoupics.greendao.DaoMaster;
+import com.bluestrom.gao.explorersogoupics.greendao.DaoSession;
 import com.bluestrom.gao.explorersogoupics.util.Const;
 import com.bluestrom.gao.explorersogoupics.util.Pub;
 import com.facebook.cache.disk.DiskCacheConfig;
 import com.facebook.common.util.ByteConstants;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
+
+import org.greenrobot.greendao.database.Database;
 
 import java.io.File;
 import java.util.Stack;
@@ -21,6 +25,8 @@ public class PicsApplication extends Application {
 
     private static PicsApplication instance = null;
     private static Stack<Activity> activityStack;
+
+    private static DaoSession daoSession;
 
     @Override
     public void onCreate() {
@@ -39,6 +45,10 @@ public class PicsApplication extends Application {
         Point point = Pub.getDisplaySize(display);
         Const.SCREEN_WIDTH = point.x;
         Const.SCREEN_HEIGHT = point.y;
+
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "notes-db");
+        Database db = helper.getWritableDb();
+        daoSession = new DaoMaster(db).newSession();
 
         DiskCacheConfig mainDiskCacheConfig = DiskCacheConfig.newBuilder(instance)
                 .setMaxCacheSize(200 * ByteConstants.MB)
@@ -61,6 +71,10 @@ public class PicsApplication extends Application {
                 .setSmallImageDiskCacheConfig(smallImageDiskCacheConfig)
                 .build();
         Fresco.initialize(this, pipelConfig);
+    }
+
+    public static DaoSession getDaoSession(){
+        return daoSession;
     }
 
     /**

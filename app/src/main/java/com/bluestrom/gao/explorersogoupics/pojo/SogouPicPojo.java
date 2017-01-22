@@ -1,14 +1,23 @@
 package com.bluestrom.gao.explorersogoupics.pojo;
 
+import com.bluestrom.gao.explorersogoupics.greendao.PicsTagsConvert;
+
+import org.greenrobot.greendao.annotation.Convert;
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Id;
+
 import java.util.List;
+import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Created by Gao-Krund on 2017/1/18.
  */
 
+@Entity()
 public class SogouPicPojo {
 
-    private int id;
+    @Id
+    private Long id;
 
     private int did;
 
@@ -48,7 +57,8 @@ public class SogouPicPojo {
 
     private String title;
 
-    private List<String> tags;
+    @Convert(converter = PicsTagsConvert.class, columnType = String.class)
+    private String[] tags;
 
     private String group_mark;
 
@@ -70,11 +80,57 @@ public class SogouPicPojo {
 
     private String webLink;
 
-    public void setId(int id) {
+    @Generated(hash = 1647193743)
+    public SogouPicPojo(Long id, int did, String thumbUrl, int thumb_width,
+            int thumb_height, String sthumbUrl, int sthumb_width, int sthumb_height,
+            String bthumbUrl, int bthumb_width, int bthumb_height, String pic_url,
+            int width, int height, int size, String ori_pic_url, String ext_url,
+            String page_title, String page_url, String title, String[] tags,
+            String group_mark, int group_index, String publish_time, String surr1,
+            String surr2, String category, int weight, int deleted, String wapLink,
+            String webLink) {
+        this.id = id;
+        this.did = did;
+        this.thumbUrl = thumbUrl;
+        this.thumb_width = thumb_width;
+        this.thumb_height = thumb_height;
+        this.sthumbUrl = sthumbUrl;
+        this.sthumb_width = sthumb_width;
+        this.sthumb_height = sthumb_height;
+        this.bthumbUrl = bthumbUrl;
+        this.bthumb_width = bthumb_width;
+        this.bthumb_height = bthumb_height;
+        this.pic_url = pic_url;
+        this.width = width;
+        this.height = height;
+        this.size = size;
+        this.ori_pic_url = ori_pic_url;
+        this.ext_url = ext_url;
+        this.page_title = page_title;
+        this.page_url = page_url;
+        this.title = title;
+        this.tags = tags;
+        this.group_mark = group_mark;
+        this.group_index = group_index;
+        this.publish_time = publish_time;
+        this.surr1 = surr1;
+        this.surr2 = surr2;
+        this.category = category;
+        this.weight = weight;
+        this.deleted = deleted;
+        this.wapLink = wapLink;
+        this.webLink = webLink;
+    }
+
+    @Generated(hash = 765004966)
+    public SogouPicPojo() {
+    }
+
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public int getId() {
+    public Long getId() {
         return this.id;
     }
 
@@ -230,11 +286,11 @@ public class SogouPicPojo {
         return this.title;
     }
 
-    public void setTags(List<String> tags) {
+    public void setTags(String[] tags) {
         this.tags = tags;
     }
 
-    public List<String> getTags() {
+    public String[] getTags() {
         return this.tags;
     }
 
