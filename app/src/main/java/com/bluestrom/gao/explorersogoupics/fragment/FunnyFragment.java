@@ -3,8 +3,8 @@ package com.bluestrom.gao.explorersogoupics.fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Message;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -46,6 +45,10 @@ public class FunnyFragment extends Fragment {
 
     private static final String TAG = "FunnyFragment";
 
+    private HandlerThread mDataHandlerThread;
+
+    private Handler mDataHandler;
+
     private List<SogouPicPojo> picsList;
 
     private OnListFragmentInteractionListener mListener;
@@ -56,7 +59,10 @@ public class FunnyFragment extends Fragment {
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
-    private static final int REFRESH_PICS_SUCCESS = 0, REFRESH_PICS_FAILURE = 1;
+    private static final int DATA_HANDLER_REQUEST_PICS_SUCCESS = 0, DATA_HANDLER_REQUEST_PICS_FAILURE = 1;
+
+    private static final int UI_HANDLER_DISMISS_REFRESHLAYOUT = 0, UI_HANDLER_INSERT_PIC = 1,
+            UI_HANDLER_SCROLL_PICS = 2, UI_HANDLER_REFRESH_PICS = 3;
 
     private int currentStartPosition;
 
@@ -70,11 +76,85 @@ public class FunnyFragment extends Fragment {
 
     private final int PICS_REQUEST_FLAG_INIT = 0, PICS_REQUEST_FLAG_REFRESH = 1, PICS_REQUEST_FLAG_LOADMORE = 2;
 
+    private Handler mUIHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case UI_HANDLER_DISMISS_REFRESHLAYOUT:
+                if (swipeRefreshLayout.isRefreshing()) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+                break;
+                case UI_HANDLER_INSERT_PIC:
+                    recyclerViewAdapter.notifyItemChanged(msg.arg1);
+                    break;
+                case UI_HANDLER_SCROLL_PICS:
+                    recyclerView.scrollToPosition(msg.arg1);
+                    break;
+                case UI_HANDLER_REFRESH_PICS:
+                    recyclerViewAdapter.notifyDataSetChanged();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
     public FunnyFragment() {
+        mDataHandlerThread = new HandlerThread("DataProcessThread");
+        mDataHandlerThread.start();
+
+        mDataHandler = new Handler(mDataHandlerThread.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                mUIHandler.obtainMessage(UI_HANDLER_DISMISS_REFRESHLAYOUT).sendToTarget();
+                switch (msg.what) {
+                    case DATA_HANDLER_REQUEST_PICS_SUCCESS:
+                        SogouPicsResult picsResult = (SogouPicsResult) msg.obj;
+                        List<SogouPicPojo> needInsertPics = picsResult.getAll_items();
+                        needInsertPics.removeAll(picsList);
+                        switch (msg.arg1) {
+                            case PICS_REQUEST_FLAG_INIT:
+                                picsList.addAll(picsResult.getAll_items());
+                                mUIHandler.obtainMessage(UI_HANDLER_REFRESH_PICS).sendToTarget();
+                                break;
+                            case PICS_REQUEST_FLAG_REFRESH:
+                                if (needInsertPics == null || !(needInsertPics.size() > 0)) {
+                                    break;
+                                }
+                                for (SogouPicPojo picPojo : needInsertPics) {
+                                    picsList.add(picPojo);
+                                    Message insertPicMsg = mUIHandler.obtainMessage(UI_HANDLER_INSERT_PIC);
+                                    insertPicMsg.arg1 = 0;
+                                    insertPicMsg.sendToTarget();
+                                }
+                                Message scrollPicsMsg = mUIHandler.obtainMessage(UI_HANDLER_SCROLL_PICS);
+                                scrollPicsMsg.arg1 = 0;
+                                scrollPicsMsg.sendToTarget();
+                                break;
+                            case PICS_REQUEST_FLAG_LOADMORE:
+                                picsList.addAll(needInsertPics);
+                                mUIHandler.obtainMessage(UI_HANDLER_REFRESH_PICS).sendToTarget();
+                                break;
+                            default:
+                                break;
+                        }
+                        currentStartPosition = picsList.size();
+                        break;
+                    case DATA_HANDLER_REQUEST_PICS_FAILURE:
+                        if (swipeRefreshLayout.isRefreshing()) {
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
     }
 
     @SuppressWarnings("unused")
@@ -140,10 +220,15 @@ public class FunnyFragment extends Fragment {
         });
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new PicsRecyclerDecoration(context));
-//        recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setAdapter(recyclerViewAdapter);
     }
 
+    /**
+     * 获取RecyclerView中的最后一个可见Item在list中的位置
+     *
+     * @param layoutManager
+     * @return
+     */
     private int getLastVisibleItemPositionFromLayoutManager(StaggeredGridLayoutManager layoutManager) {
         int result = 0;
         int[] positions = layoutManager.findLastVisibleItemPositions(null);
@@ -155,59 +240,10 @@ public class FunnyFragment extends Fragment {
         return result;
     }
 
-    private Handler mUIHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case REFRESH_PICS_SUCCESS:
-                    if (swipeRefreshLayout.isRefreshing()) {
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
-                    if (swipeRefreshLayout.isRefreshing()) {
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
-                    SogouPicsResult picsResult = (SogouPicsResult) msg.obj;
-//                    List<SogouPicPojo> needInsertPics = needInsertPicsToList(picsResult.getAll_items(), picsList);
-                    List<SogouPicPojo> needInsertPics = picsResult.getAll_items();
-                    needInsertPics.removeAll(picsList);
-                    switch (msg.arg1) {
-                        case PICS_REQUEST_FLAG_INIT:
-                            picsList.addAll(picsResult.getAll_items());
-                            recyclerViewAdapter.notifyDataSetChanged();
-                            break;
-                        case PICS_REQUEST_FLAG_REFRESH:
-                            if (needInsertPics == null || !(needInsertPics.size() > 0)) {
-                                break;
-                            }
-                            for (SogouPicPojo picPojo : needInsertPics) {
-                                picsList.add(picPojo);
-                                recyclerViewAdapter.notifyItemInserted(0);
-                            }
-                            recyclerView.scrollToPosition(0);
-                            break;
-                        case PICS_REQUEST_FLAG_LOADMORE:
-                            picsList.addAll(needInsertPics);
-                            recyclerViewAdapter.notifyDataSetChanged();
-                            break;
-                        default:
-                            break;
-                    }
-                    currentStartPosition = picsList.size();
-                    break;
-                case REFRESH_PICS_FAILURE:
-                    if (swipeRefreshLayout.isRefreshing()) {
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
-
     @Override
     public void onDetach() {
         super.onDetach();
+        mDataHandlerThread.quit();
         mListener = null;
     }
 
@@ -225,7 +261,8 @@ public class FunnyFragment extends Fragment {
     private List<SogouPicPojo> needInsertPicsToList(List<SogouPicPojo> shallInsertList, List<SogouPicPojo> originList) {
         Long startTime = System.currentTimeMillis();
         List<SogouPicPojo> result = new ArrayList<>();
-        tag: for (SogouPicPojo picPojo : shallInsertList) {
+        tag:
+        for (SogouPicPojo picPojo : shallInsertList) {
             for (SogouPicPojo originPojo : originList) {
                 if (picPojo.getId() == originPojo.getId()) {
                     continue tag;
@@ -271,7 +308,7 @@ public class FunnyFragment extends Fragment {
             @Override
             public void onFailure(Call call, IOException e) {
                 isRequestingPics = false;
-                Message msg = mUIHandler.obtainMessage(REFRESH_PICS_FAILURE);
+                Message msg = mDataHandler.obtainMessage(DATA_HANDLER_REQUEST_PICS_FAILURE);
                 msg.sendToTarget();
             }
 
@@ -282,7 +319,7 @@ public class FunnyFragment extends Fragment {
                     if (!response.isSuccessful())
                         throw new IOException("Unexpected code " + response);
                     SogouPicsResult result = Pub.getGsonClient().fromJson(response.body().charStream(), SogouPicsResult.class);
-                    Message msg = mUIHandler.obtainMessage(REFRESH_PICS_SUCCESS);
+                    Message msg = mDataHandler.obtainMessage(DATA_HANDLER_REQUEST_PICS_SUCCESS);
                     msg.obj = result;
                     msg.arg1 = flag;
                     msg.sendToTarget();

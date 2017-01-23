@@ -40,6 +40,7 @@ public class PicsApplication extends Application {
     }
 
     private void init() {
+        PicsUncaughtException.getInstance().inti(instance);
         WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         Point point = Pub.getDisplaySize(display);
@@ -73,7 +74,7 @@ public class PicsApplication extends Application {
         Fresco.initialize(this, pipelConfig);
     }
 
-    public static DaoSession getDaoSession(){
+    public static DaoSession getDaoSession() {
         return daoSession;
     }
 
