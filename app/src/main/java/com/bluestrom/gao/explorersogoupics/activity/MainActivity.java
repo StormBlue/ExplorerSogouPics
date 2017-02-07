@@ -1,5 +1,7 @@
 package com.bluestrom.gao.explorersogoupics.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -8,9 +10,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 
 import com.bluestrom.gao.explorersogoupics.R;
 import com.bluestrom.gao.explorersogoupics.adapter.MainContentViewPagerAdapter;
+import com.bluestrom.gao.explorersogoupics.application.PicsApplication;
 import com.bluestrom.gao.explorersogoupics.fragment.FunnyFragment;
 import com.bluestrom.gao.explorersogoupics.pojo.SogouPicPojo;
 
@@ -20,6 +24,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, FunnyFragment.OnListFragmentInteractionListener, View.OnClickListener {
 
     private static final String TAG = "MainActivity";
+
+    private Context mContext;
 
     private ViewPager contentViewPager;
 
@@ -31,7 +37,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
         super.onCreate(savedInstanceState);
+        mContext = this;
         setContentView(R.layout.activity_main);
         init();
     }

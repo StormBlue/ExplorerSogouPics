@@ -1,6 +1,10 @@
 package com.bluestrom.gao.explorersogoupics.adapter;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.bluestrom.gao.explorersogoupics.R;
+import com.bluestrom.gao.explorersogoupics.activity.PhotoDetailActivity;
 import com.bluestrom.gao.explorersogoupics.fragment.FunnyFragment;
 import com.bluestrom.gao.explorersogoupics.fragment.dummy.DummyContent.PhotoBean;
 import com.bluestrom.gao.explorersogoupics.pojo.SogouPicPojo;
@@ -28,10 +33,13 @@ public class PhotoBeanRecyclerViewAdapter extends RecyclerView.Adapter<PhotoBean
 
     private static final String TAG = "PhotoBeanRecyclerViewAdapter";
 
+    private Activity mActivity;
+
     private final List<SogouPicPojo> mValues;
     private final FunnyFragment.OnListFragmentInteractionListener mListener;
 
-    public PhotoBeanRecyclerViewAdapter(List<SogouPicPojo> items, FunnyFragment.OnListFragmentInteractionListener listener) {
+    public PhotoBeanRecyclerViewAdapter(Activity context, List<SogouPicPojo> items, FunnyFragment.OnListFragmentInteractionListener listener) {
+        mActivity = context;
         mValues = items;
         mListener = listener;
     }
@@ -57,6 +65,13 @@ public class PhotoBeanRecyclerViewAdapter extends RecyclerView.Adapter<PhotoBean
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+//                Bundle options = ActivityOptionsCompat.makeSceneTransitionAnimation(mActivity, holder.picThumb, mActivity.getString(R.string.photo_detail_transition)).toBundle();
+//                Intent detailIntent = new Intent(mActivity, PhotoDetailActivity.class);
+//                detailIntent.putExtra(PhotoDetailActivity.PHOTO_POJO, holder.mItem);
+//                mActivity.startActivity(detailIntent, options);
+                Intent detailIntent = new Intent(mActivity, PhotoDetailActivity.class);
+                detailIntent.putExtra(PhotoDetailActivity.PHOTO_POJO, holder.mItem);
+                mActivity.startActivity(detailIntent);
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.

@@ -1,21 +1,21 @@
 package com.bluestrom.gao.explorersogoupics.pojo;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.bluestrom.gao.explorersogoupics.greendao.PicsTagsConvert;
 
 import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Id;
-
-import java.util.List;
-
 import org.greenrobot.greendao.annotation.Generated;
+import org.greenrobot.greendao.annotation.Id;
 
 /**
  * Created by Gao-Krund on 2017/1/18.
  */
 
 @Entity()
-public class SogouPicPojo {
+public class SogouPicPojo implements Parcelable {
 
     @Id(autoincrement = true)
     private long logId;
@@ -384,6 +384,44 @@ public class SogouPicPojo {
 
     public String getWebLink() {
         return this.webLink;
+    }
+
+    private SogouPicPojo(Parcel in) {
+        title = in.readString();
+        sthumbUrl = in.readString();
+        pic_url = in.readString();
+        width = in.readInt();
+        height = in.readInt();
+        ori_pic_url = in.readString();
+        tags = in.createStringArray();
+    }
+
+    // 用来创建自定义的Parcelable的对象
+    public static final Parcelable.Creator<SogouPicPojo> CREATOR
+            = new Parcelable.Creator<SogouPicPojo>() {
+        public SogouPicPojo createFromParcel(Parcel in) {
+            return new SogouPicPojo(in);
+        }
+
+        public SogouPicPojo[] newArray(int size) {
+            return new SogouPicPojo[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(sthumbUrl);
+        dest.writeString(pic_url);
+        dest.writeInt(width);
+        dest.writeInt(height);
+        dest.writeString(ori_pic_url);
+        dest.writeStringArray(tags);
     }
 
     @Override

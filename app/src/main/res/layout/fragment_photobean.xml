@@ -11,7 +11,9 @@
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/pic_thumb"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:transitionName="@string/photo_detail_transition"
+        app:pressedStateOverlayImage="@android:drawable/screen_background_dark_transparent" />
 
     <ScrollView
         android:layout_width="match_parent"

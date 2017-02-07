@@ -81,10 +81,10 @@ public class FunnyFragment extends Fragment {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case UI_HANDLER_DISMISS_REFRESHLAYOUT:
-                if (swipeRefreshLayout.isRefreshing()) {
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-                break;
+                    if (swipeRefreshLayout.isRefreshing()) {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                    break;
                 case UI_HANDLER_INSERT_PIC:
                     recyclerViewAdapter.notifyItemChanged(msg.arg1);
                     break;
@@ -116,6 +116,7 @@ public class FunnyFragment extends Fragment {
                     case DATA_HANDLER_REQUEST_PICS_SUCCESS:
                         SogouPicsResult picsResult = (SogouPicsResult) msg.obj;
                         List<SogouPicPojo> needInsertPics = picsResult.getAll_items();
+                        if (needInsertPics == null) return;
                         needInsertPics.removeAll(picsList);
                         switch (msg.arg1) {
                             case PICS_REQUEST_FLAG_INIT:
@@ -123,7 +124,7 @@ public class FunnyFragment extends Fragment {
                                 mUIHandler.obtainMessage(UI_HANDLER_REFRESH_PICS).sendToTarget();
                                 break;
                             case PICS_REQUEST_FLAG_REFRESH:
-                                if (needInsertPics == null || !(needInsertPics.size() > 0)) {
+                                if (!(needInsertPics.size() > 0)) {
                                     break;
                                 }
                                 for (SogouPicPojo picPojo : needInsertPics) {
@@ -179,7 +180,7 @@ public class FunnyFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         picsList = new ArrayList<>();
-        recyclerViewAdapter = new PhotoBeanRecyclerViewAdapter(picsList, mListener);
+        recyclerViewAdapter = new PhotoBeanRecyclerViewAdapter(getActivity(), picsList, mListener);
     }
 
     @Override
