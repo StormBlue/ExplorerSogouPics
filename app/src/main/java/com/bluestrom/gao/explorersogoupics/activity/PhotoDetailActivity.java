@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
@@ -15,17 +14,13 @@ import android.view.Window;
 
 import com.bluestrom.gao.explorersogoupics.R;
 import com.bluestrom.gao.explorersogoupics.pojo.SogouPicPojo;
-import com.facebook.common.executors.CallerThreadExecutor;
-import com.facebook.common.references.CloseableReference;
-import com.facebook.datasource.DataSource;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.facebook.imagepipeline.core.ImagePipeline;
-import com.facebook.imagepipeline.datasource.BaseBitmapDataSubscriber;
-import com.facebook.imagepipeline.image.CloseableImage;
+import com.facebook.imagepipeline.request.BasePostprocessor;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.facebook.imagepipeline.request.Postprocessor;
 
 public class PhotoDetailActivity extends AppCompatActivity {
 
@@ -78,6 +73,25 @@ public class PhotoDetailActivity extends AppCompatActivity {
         });
         toolbar.setTitle(picPojo.getTitle());
         picOrigin = (SimpleDraweeView) findViewById(R.id.pic_origin);
+        Postprocessor getPaletteProcessor = new BasePostprocessor() {
+            @Override
+            public String getName() {
+                return "getPaletteProcessor";
+            }
+
+            @Override
+            public void process(Bitmap bitmap) {
+                if (null == bitmap || bitmap.isRecycled()) return;
+                Palette palette = Palette.from(bitmap).generate();
+                Message paletteMsg = mUIHandler.obtainMessage(UPDATE_TOOLBAR_COLOR);
+                paletteMsg.arg1 = palette.getLightMutedColor(getResources().getColor(R.color.colorPrimary));
+                paletteMsg.sendToTarget();
+            }
+        };
+        ImageRequest lowPicRequest = ImageRequestBuilder.newBuilderWithSource(Uri.parse(picPojo.getSthumbUrl()))
+                .setProgressiveRenderingEnabled(true)
+                .setPostprocessor(getPaletteProcessor)
+                .build();
         ImageRequest sogouPicRequest = ImageRequestBuilder.newBuilderWithSource(Uri.parse(picPojo.getPic_url()))
                 .setProgressiveRenderingEnabled(true)
                 .build();
@@ -86,34 +100,12 @@ public class PhotoDetailActivity extends AppCompatActivity {
                 .build();
         ImageRequest[] requests = {sogouPicRequest, originPicrequest};
         DraweeController originController = Fresco.newDraweeControllerBuilder()
-                .setLowResImageRequest(ImageRequest.fromUri(Uri.parse(picPojo.getSthumbUrl())))
+                .setLowResImageRequest(lowPicRequest)
                 .setFirstAvailableImageRequests(requests)
                 .setOldController(picOrigin.getController())
                 .build();
         picOrigin.setAspectRatio((float) picPojo.getWidth() / picPojo.getHeight());
         picOrigin.setController(originController);
-
-        ImagePipeline imagePipeline = Fresco.getImagePipeline();
-        DataSource<CloseableReference<CloseableImage>> dataSource =
-                imagePipeline.fetchImageFromBitmapCache(ImageRequest.fromUri(picPojo.getSthumbUrl()), imagePipeline.);
-        try {
-            dataSource.subscribe(new BaseBitmapDataSubscriber() {
-                                     @Override
-                                     public void onNewResultImpl(@Nullable Bitmap bitmap) {
-                                         Palette palette = Palette.from(bitmap).generate();
-                                         Message paletteMsg = mUIHandler.obtainMessage(UPDATE_TOOLBAR_COLOR);
-                                         paletteMsg.arg1 = palette.getDarkMutedColor(getResources().getColor(R.color.colorPrimary));
-                                         paletteMsg.sendToTarget();
-                                     }
-
-                                     @Override
-                                     public void onFailureImpl(DataSource dataSource) {
-                                     }
-                                 },
-                    CallerThreadExecutor.getInstance());
-        } finally {
-            dataSource.close();
-        }
     }
 
 }

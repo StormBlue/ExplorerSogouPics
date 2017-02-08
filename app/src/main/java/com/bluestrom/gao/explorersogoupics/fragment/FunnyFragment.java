@@ -302,7 +302,7 @@ public class FunnyFragment extends Fragment {
         if (isRequestingPics) return;
         Map<String, String> params = new HashMap<>();
         params.put("category", "美女");
-        params.put("tag", "");
+        params.put("tag", "文艺");
         params.put("start", PICS_REQUEST_FLAG_LOADMORE != flag ? String.valueOf(0) : String.valueOf(currentStartPosition));
         params.put("len", String.valueOf(picsRequestNum));
         Callback picCallback = new Callback() {
