@@ -5,7 +5,6 @@
     android:id="@+id/activity_photo_detail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black_background"
     tools:context="com.bluestrom.gao.explorersogoupics.activity.PhotoDetailActivity">
 
     <ScrollView
@@ -22,14 +21,25 @@
             <com.facebook.drawee.view.SimpleDraweeView
                 android:id="@+id/pic_origin"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:transitionName="@string/photo_detail_transition" />
 
-            <RelativeLayout
+            <LinearLayout
+                android:id="@+id/tags_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
 
-            </RelativeLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tag_label"
+                    android:textColor="@color/tag_label_color" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

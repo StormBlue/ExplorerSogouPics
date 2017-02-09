@@ -8,12 +8,18 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.bluestrom.gao.explorersogoupics.R;
 import com.bluestrom.gao.explorersogoupics.pojo.SogouPicPojo;
+import com.bluestrom.gao.explorersogoupics.util.Pub;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -37,15 +43,18 @@ public class PhotoDetailActivity extends AppCompatActivity {
 
     private SimpleDraweeView picOrigin;
 
+    private LinearLayout tagsLayout;
+
+    private boolean hasSetStatusBarColor;
+
     private Handler mUIHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case UPDATE_TOOLBAR_COLOR:
+                    hasSetStatusBarColor = true;
+                    getWindow().setStatusBarColor(msg.arg1);
                     toolbar.setBackgroundColor(msg.arg1);
-                    if (mUIHandler.hasMessages(UPDATE_TOOLBAR_COLOR)) {
-                        mUIHandler.removeMessages(UPDATE_TOOLBAR_COLOR);
-                    }
                     break;
                 default:
                     break;
@@ -68,6 +77,7 @@ public class PhotoDetailActivity extends AppCompatActivity {
 
     private void initView() {
         toolbar = (Toolbar) findViewById(R.id.activity_detail_toolbar);
+        tagsLayout = (LinearLayout) findViewById(R.id.tags_layout);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,10 +94,10 @@ public class PhotoDetailActivity extends AppCompatActivity {
 
             @Override
             public void process(Bitmap bitmap) {
-                if (null == bitmap || bitmap.isRecycled()) return;
+                if (hasSetStatusBarColor || null == bitmap || bitmap.isRecycled()) return;
                 Palette palette = Palette.from(bitmap).generate();
                 Message paletteMsg = mUIHandler.obtainMessage(UPDATE_TOOLBAR_COLOR);
-                paletteMsg.arg1 = palette.getDarkMutedColor(getResources().getColor(R.color.colorPrimary));
+                paletteMsg.arg1 = palette.getMutedColor(getResources().getColor(R.color.colorPrimary));
                 paletteMsg.sendToTarget();
             }
         };
@@ -111,6 +121,22 @@ public class PhotoDetailActivity extends AppCompatActivity {
                 .build();
         picOrigin.setAspectRatio((float) picPojo.getWidth() / picPojo.getHeight());
         picOrigin.setController(originController);
+        LinearLayout.LayoutParams tagLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        tagLayoutParams.setMargins(16, 0, 0, 0);
+        for (int i = 0; i < picPojo.getTags().length; i++) {
+            TextView tagTextView = new TextView(getApplicationContext());
+            tagTextView.setLayoutParams(tagLayoutParams);
+            tagTextView.setBackgroundColor(getResources().getColor(R.color.tag_background_color));
+            tagTextView.setTextColor(getResources().getColor(android.R.color.black));
+            tagTextView.setPadding(5, 3, 5, 3);
+            tagTextView.setText(picPojo.getTags()[i]);
+            tagsLayout.addView(tagTextView);
+        }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        hasSetStatusBarColor = false;
+    }
 }

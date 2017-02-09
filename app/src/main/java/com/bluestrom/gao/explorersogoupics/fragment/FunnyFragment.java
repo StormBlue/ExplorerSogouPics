@@ -13,6 +13,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.bluestrom.gao.explorersogoupics.R;
 import com.bluestrom.gao.explorersogoupics.adapter.PhotoBeanRecyclerViewAdapter;
@@ -222,6 +223,7 @@ public class FunnyFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new PicsRecyclerDecoration(context));
         recyclerView.setAdapter(recyclerViewAdapter);
+        recyclerView.getOverlay().add(getResources().getDrawable(R.color.black_background));
     }
 
     /**
