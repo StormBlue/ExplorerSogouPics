@@ -43,6 +43,9 @@ public class PhotoDetailActivity extends AppCompatActivity {
             switch (msg.what) {
                 case UPDATE_TOOLBAR_COLOR:
                     toolbar.setBackgroundColor(msg.arg1);
+                    if (mUIHandler.hasMessages(UPDATE_TOOLBAR_COLOR)) {
+                        mUIHandler.removeMessages(UPDATE_TOOLBAR_COLOR);
+                    }
                     break;
                 default:
                     break;
@@ -84,7 +87,7 @@ public class PhotoDetailActivity extends AppCompatActivity {
                 if (null == bitmap || bitmap.isRecycled()) return;
                 Palette palette = Palette.from(bitmap).generate();
                 Message paletteMsg = mUIHandler.obtainMessage(UPDATE_TOOLBAR_COLOR);
-                paletteMsg.arg1 = palette.getLightMutedColor(getResources().getColor(R.color.colorPrimary));
+                paletteMsg.arg1 = palette.getDarkMutedColor(getResources().getColor(R.color.colorPrimary));
                 paletteMsg.sendToTarget();
             }
         };
@@ -94,9 +97,11 @@ public class PhotoDetailActivity extends AppCompatActivity {
                 .build();
         ImageRequest sogouPicRequest = ImageRequestBuilder.newBuilderWithSource(Uri.parse(picPojo.getPic_url()))
                 .setProgressiveRenderingEnabled(true)
+                .setPostprocessor(getPaletteProcessor)
                 .build();
         ImageRequest originPicrequest = ImageRequestBuilder.newBuilderWithSource(Uri.parse(picPojo.getOri_pic_url()))
                 .setProgressiveRenderingEnabled(true)
+                .setPostprocessor(getPaletteProcessor)
                 .build();
         ImageRequest[] requests = {sogouPicRequest, originPicrequest};
         DraweeController originController = Fresco.newDraweeControllerBuilder()

@@ -5,6 +5,7 @@
     android:id="@+id/activity_photo_detail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black_background"
     tools:context="com.bluestrom.gao.explorersogoupics.activity.PhotoDetailActivity">
 
     <ScrollView
@@ -21,7 +22,7 @@
             <com.facebook.drawee.view.SimpleDraweeView
                 android:id="@+id/pic_origin"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:transitionName="@string/photo_detail_transition" />
 
             <RelativeLayout
