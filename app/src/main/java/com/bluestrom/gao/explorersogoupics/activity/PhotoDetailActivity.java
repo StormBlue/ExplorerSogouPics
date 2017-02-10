@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,7 +52,12 @@ public class PhotoDetailActivity extends AppCompatActivity {
             switch (msg.what) {
                 case UPDATE_TOOLBAR_COLOR:
                     hasSetStatusBarColor = true;
-                    getWindow().setStatusBarColor(msg.arg1);
+                    Window window = getWindow();
+                    // clear FLAG_TRANSLUCENT_STATUS flag:
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                    // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+                    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    getWindow().setStatusBarColor(Pub.modifyColorBrightness(msg.arg1, (float) 0.8));
                     toolbar.setBackgroundColor(msg.arg1);
                     break;
                 default:
@@ -119,7 +123,8 @@ public class PhotoDetailActivity extends AppCompatActivity {
                 .setFirstAvailableImageRequests(requests)
                 .setOldController(picOrigin.getController())
                 .build();
-        picOrigin.setAspectRatio((float) picPojo.getWidth() / picPojo.getHeight());
+        // 在width或height为wrap_content时，通过设定长宽比来控制Draweeview大小
+        // picOrigin.setAspectRatio((float) picPojo.getWidth() / picPojo.getHeight());
         picOrigin.setController(originController);
         LinearLayout.LayoutParams tagLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         tagLayoutParams.setMargins(16, 0, 0, 0);

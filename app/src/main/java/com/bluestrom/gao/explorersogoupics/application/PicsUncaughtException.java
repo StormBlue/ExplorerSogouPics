@@ -40,5 +40,6 @@ public class PicsUncaughtException implements Thread.UncaughtExceptionHandler {
         StringWriter stackTrace = new StringWriter();
         e.printStackTrace(new PrintWriter(stackTrace));
         AppLog.e(TAG, stackTrace.toString());
+        System.exit(-1);
     }
 }
