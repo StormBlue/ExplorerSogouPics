@@ -73,7 +73,7 @@
                 android:textColor="@color/tag_label_color" />
         </LinearLayout>
 
-        <com.facebook.drawee.view.SimpleDraweeView
+        <com.bluestrom.gao.explorersogoupics.uiutil.PinchToZoomDraweeView
             android:id="@+id/pic_origin"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

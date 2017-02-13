@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.bluestrom.gao.explorersogoupics.R;
 import com.bluestrom.gao.explorersogoupics.pojo.SogouPicPojo;
+import com.bluestrom.gao.explorersogoupics.uiutil.PinchToZoomDraweeView;
 import com.bluestrom.gao.explorersogoupics.util.Pub;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
@@ -40,7 +41,7 @@ public class PhotoDetailActivity extends AppCompatActivity {
 
     private SogouPicPojo picPojo;
 
-    private SimpleDraweeView picOrigin;
+    private PinchToZoomDraweeView picOrigin;
 
     private LinearLayout tagsLayout;
 
@@ -89,7 +90,7 @@ public class PhotoDetailActivity extends AppCompatActivity {
             }
         });
         toolbar.setTitle(picPojo.getTitle());
-        picOrigin = (SimpleDraweeView) findViewById(R.id.pic_origin);
+        picOrigin = (PinchToZoomDraweeView) findViewById(R.id.pic_origin);
         Postprocessor getPaletteProcessor = new BasePostprocessor() {
             @Override
             public String getName() {
